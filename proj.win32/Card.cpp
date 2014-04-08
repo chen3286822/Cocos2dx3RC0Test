@@ -29,5 +29,5 @@ Card::~Card()
 
 bool Card::init()
 {
-	
+	return true;
 }
