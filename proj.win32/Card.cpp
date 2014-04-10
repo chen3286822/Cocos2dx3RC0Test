@@ -11,6 +11,7 @@ Card* Card::create(int num)
 		card->setNum(num);
 		return card;
 	}
+
 	CC_SAFE_DELETE(card);
 	return nullptr;
 }
