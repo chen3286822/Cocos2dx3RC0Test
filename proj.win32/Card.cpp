@@ -3,7 +3,7 @@
 USING_NS_CC;
 
 Card* Card::create(int num)
-{
+{ 
 	Card* card = new Card();
 	if(card)
 	{
