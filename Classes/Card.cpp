@@ -30,5 +30,7 @@ Card::~Card()
 
 bool Card::init()
 {
+	m_pCardTex = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("blank.png"));
+	m_pCardTex->setTextureRect(CCRectMake(0, 0, 50, 50));
 	return true;
 }
