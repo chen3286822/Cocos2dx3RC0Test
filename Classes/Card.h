@@ -3,9 +3,15 @@
 
 #include "cocos2d.h"
 
+enum eChild
+{
+	eChild_CardTex,
+	eChild_Label,
+};
+
 class Card : public cocos2d::Node
 {
-	CC_SYNTHESIZE(int,m_nNum,Num);//记录该卡片数字
+	CC_PROPERTY(int, m_nNum, Num);//记录该卡片数字
 public:
 	static Card* create(int num);
 

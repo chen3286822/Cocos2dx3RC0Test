@@ -2,6 +2,7 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "Card.h"
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -14,9 +15,14 @@ public:
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
+
+	void AddNewNum();
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
+
+private:
+	Card* m_Cards[4][4];
 };
 
 #endif // __HELLOWORLD_SCENE_H__
