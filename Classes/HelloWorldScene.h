@@ -16,6 +16,9 @@ public:
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
 
+	//½ÓÊÜ·µ»Ø¼ü
+	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
+
 	void AddNewNum();
     
     // implement the "static create()" method manually

@@ -28,6 +28,10 @@ bool HelloWorld::init()
         return false;
     }
 
+	auto listener = EventListenerKeyboard::create();
+	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
 	srand((unsigned int)time(NULL));
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -87,6 +91,18 @@ bool HelloWorld::init()
 	}
 	//AddNewNum();
     return true;
+}
+
+void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
+{
+	if (keycode == EventKeyboard::KeyCode::KEY_BACKSPACE)
+	{
+		if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		{
+			Director::getInstance()->end();
+			exit(0);
+		}
+	}
 }
 
 void HelloWorld::AddNewNum()

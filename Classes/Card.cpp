@@ -31,7 +31,7 @@ Card::~Card()
 void Card::setNum(int var)
 {
 	m_nNum = var;
-	auto label = dynamic_cast<LabelAtlas*>(getChildByTag(eChild_Label));
+	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_Label));
 	if (label)
 	{
 		char temp[50];
@@ -53,9 +53,9 @@ bool Card::init()
 	m_pCardTex->setAnchorPoint(cocos2d::Point(0, 0));
 	addChild(m_pCardTex, 1, eChild_CardTex);
 
-	auto label = LabelAtlas::create("", "fonts/tuffy_bold_italic-charmap.plist");
+	auto label = LabelTTF::create("", "Arial", 24);
 	//label->setAnchorPoint(cocos2d::Point(0.5, 0.5));
-	label->setPosition(Point(50/2,50/2));
+	label->setPosition(Point(15,15));
 	addChild(label, 1, eChild_Label);
 	return true;
 }
