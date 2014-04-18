@@ -23,7 +23,7 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !Layer::init() )
+	if (!LayerColor::initWithColor(Color4B::WHITE))
     {
         return false;
     }
@@ -69,15 +69,16 @@ bool HelloWorld::init()
 
     // add the label as a child to this layer
     this->addChild(label, 1);
-
+	*/
     // add "HelloWorld" splash screen"
     auto sprite = Sprite::create("HelloWorld.png");
 
     // position the sprite on the center of the screen
     sprite->setPosition(Point(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+	//sprite->setTextureRect(cocos2d::Rect(0, 0, 50, 50));
 
     // add the sprite as a child to this layer
-    this->addChild(sprite, 0);*/
+   // this->addChild(sprite, 0);
     
 	Director::getInstance()->getTextureCache()->addImage("blank.png");
 	for (int i = 0; i < 16;i++)
@@ -100,9 +101,13 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 		if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 		{
 			Director::getInstance()->end();
-			exit(0);
 		}
 	}
+	else if (keycode == EventKeyboard::KeyCode::KEY_ESCAPE)
+	{
+		Director::getInstance()->end();
+	}
+	
 }
 
 void HelloWorld::AddNewNum()

@@ -20,8 +20,12 @@ bool AppDelegate::applicationDidFinishLaunching() {
         director->setOpenGLView(glview);
     }
 
+	auto winSize = director->getWinSize();
+	glview->setDesignResolutionSize(320, 480, ResolutionPolicy::SHOW_ALL);
+	winSize = director->getWinSize();
+
     // turn on display FPS
-    director->setDisplayStats(true);
+    director->setDisplayStats(false);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
