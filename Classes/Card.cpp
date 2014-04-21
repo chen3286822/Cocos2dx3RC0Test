@@ -2,10 +2,10 @@
 
 USING_NS_CC;
 
-Card* Card::create(int num)
+Card* Card::create(int num,int length)
 {
 	Card* card = new Card();
-	if(card && card->init())
+	if(card && card->init(length))
 	{
 		card->autorelease();
 		card->setNum(num);
@@ -32,7 +32,7 @@ void Card::setNum(int var)
 {
 	m_nNum = var;
 	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_Label));
-	if (label)
+	if (label && m_pCardTex)
 	{
 		char temp[50];
 		sprintf(temp, "%d", m_nNum);
@@ -45,17 +45,24 @@ int Card::getNum()
 	return m_nNum;
 }
 
-bool Card::init()
+bool Card::init(int length)
 {
+	//其实Node::init一直都返回true
+	if (!Node::init())
+	{
+		return false;
+	}
+
+
 	m_pCardTex = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("blank.png"));
-	m_pCardTex->setTextureRect(cocos2d::Rect(0, 0, 50, 50));
+	m_pCardTex->setTextureRect(cocos2d::Rect(0, 0, length, length));
 	m_pCardTex->setColor(Color3B::ORANGE);
 	m_pCardTex->setAnchorPoint(cocos2d::Point(0, 0));
 	addChild(m_pCardTex, 1, eChild_CardTex);
 
-	auto label = LabelTTF::create("", "Arial", 24);
+	auto label = LabelTTF::create("", "Arial", length/2);
 	//label->setAnchorPoint(cocos2d::Point(0.5, 0.5));
-	label->setPosition(Point(15,15));
+	label->setPosition(Point(length / 2, length/2));
 	addChild(label, 1, eChild_Label);
 	return true;
 }

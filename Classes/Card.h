@@ -13,9 +13,9 @@ class Card : public cocos2d::Node
 {
 	CC_PROPERTY(int, m_nNum, Num);//¼ÇÂ¼¸Ã¿¨Æ¬Êý×Ö
 public:
-	static Card* create(int num);
+	static Card* create(int num,int length);
 
-	virtual bool init();
+	bool init(int length);
 private:
 	Card();
 	~Card();

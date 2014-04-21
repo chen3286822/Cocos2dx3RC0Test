@@ -21,7 +21,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
 	auto winSize = director->getWinSize();
-	glview->setDesignResolutionSize(320, 480, ResolutionPolicy::SHOW_ALL);
+	glview->setDesignResolutionSize(480, 854, ResolutionPolicy::NO_BORDER);
 	winSize = director->getWinSize();
 
     // turn on display FPS

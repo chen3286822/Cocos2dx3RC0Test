@@ -1,6 +1,5 @@
 #include "HelloWorldScene.h"
 
-
 USING_NS_CC;
 
 Scene* HelloWorld::createScene()
@@ -23,7 +22,7 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-	if (!LayerColor::initWithColor(Color4B::WHITE))
+	if (!LayerColor::initWithColor(Color4B::GRAY))
     {
         return false;
     }
@@ -81,13 +80,19 @@ bool HelloWorld::init()
    // this->addChild(sprite, 0);
     
 	Director::getInstance()->getTextureCache()->addImage("blank.png");
+	//计算卡片长宽以及位置
+	auto border = 5;	//卡片间距
+	auto shorter = std::min(visibleSize.width, visibleSize.height);
+	auto cardLength = (shorter - border * 5) / 4;
+	auto offsetX = border + origin.x;
+	auto offsetY = (std::max(visibleSize.width, visibleSize.height) - shorter) / 2 + origin.y;
 	for (int i = 0; i < 16;i++)
 	{
 		int x = i / 4;
 		int y = i % 4;
-		m_Cards[x][y] = Card::create(i);
+		m_Cards[x][y] = Card::create(i,cardLength);
 		addChild(m_Cards[x][y]);
-		m_Cards[x][y]->setPosition(cocos2d::Point(y*60,x*60));
+		m_Cards[x][y]->setPosition(cocos2d::Point(y*(border + cardLength) + offsetX, x*(border + cardLength) + offsetY));
 
 	}
 	//AddNewNum();
