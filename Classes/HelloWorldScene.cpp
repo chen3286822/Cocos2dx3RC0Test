@@ -4,165 +4,181 @@ USING_NS_CC;
 
 Scene* HelloWorld::createScene()
 {
-    // 'scene' is an autorelease object
-    auto scene = Scene::create();
-    
-    // 'layer' is an autorelease object
-    auto layer = HelloWorld::create();
+	// 'scene' is an autorelease object
+	auto scene = Scene::create();
 
-    // add layer as a child to scene
-    scene->addChild(layer);
+	// 'layer' is an autorelease object
+	auto layer = HelloWorld::create();
 
-    // return the scene
-    return scene;
+	// add layer as a child to scene
+	scene->addChild(layer);
+
+	// return the scene
+	return scene;
 }
 
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
-    //////////////////////////////
-    // 1. super init first
+	//////////////////////////////
+	// 1. super init first
 	if (!LayerColor::initWithColor(Color4B::GRAY))
-    {
-        return false;
-    }
+	{
+		return false;
+	}
 
 	auto listener = EventListenerKeyboard::create();
 	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	srand((unsigned int)time(NULL));
-    
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    Point origin = Director::getInstance()->getVisibleOrigin();
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Point origin = Director::getInstance()->getVisibleOrigin();
+	m_nShorter = std::min(visibleSize.width, visibleSize.height);
+	m_nCardLength = (m_nShorter - m_nBorder * 5) / 4;
+	m_nOffsetX = m_nBorder + origin.x;
+	m_nOffsetY = (std::max(visibleSize.width, visibleSize.height) - m_nShorter) / 2 + origin.y;
 
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-    
-	closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-                                origin.y + closeItem->getContentSize().height/2));
+	/////////////////////////////
+	// 2. add a menu item with "X" image, which is clicked to quit the program
+	//    you may modify it.
 
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Point::ZERO);
-    this->addChild(menu, 1);
+	// add a "close" icon to exit the progress. it's an autorelease object
+	auto closeItem = MenuItemImage::create(
+		"CloseNormal.png",
+		"CloseSelected.png",
+		CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
 
-    /////////////////////////////
-    // 3. add your codes below...
+	closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
+		origin.y + closeItem->getContentSize().height / 2));
 
-    // add a label shows "Hello World"
-    // create and initialize a label
-    
-   /* auto label = LabelTTF::create("Hello World", "Arial", 24);
-    
-    // position the label on the center of the screen
-    label->setPosition(Point(origin.x + visibleSize.width/2,
-                            origin.y + visibleSize.height - label->getContentSize().height));
+	// create menu, it's an autorelease object
+	auto menu = Menu::create(closeItem, NULL);
+	menu->setPosition(Point::ZERO);
+	this->addChild(menu, 1);
 
-    // add the label as a child to this layer
-    this->addChild(label, 1);
-	*/
-    // add "HelloWorld" splash screen"
-    auto sprite = Sprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
-    sprite->setPosition(Point(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-	//sprite->setTextureRect(cocos2d::Rect(0, 0, 50, 50));
-
-    // add the sprite as a child to this layer
-   // this->addChild(sprite, 0);
-    
+	/////////////////////////////
+	// 3. add your codes below...
 	Director::getInstance()->getTextureCache()->addImage("blank.png");
-	//计算卡片长宽以及位置
-	auto border = 5;	//卡片间距
-	auto shorter = std::min(visibleSize.width, visibleSize.height);
-	auto cardLength = (shorter - border * 5) / 4;
-	auto offsetX = border + origin.x;
-	auto offsetY = (std::max(visibleSize.width, visibleSize.height) - shorter) / 2 + origin.y;
-	for (int i = 0; i < 16;i++)
-	{
-		int x = i / 4;
-		int y = i % 4;
-		m_Cards[x][y] = Card::create(i,cardLength);
-		addChild(m_Cards[x][y]);
-		m_Cards[x][y]->setPosition(cocos2d::Point(y*(border + cardLength) + offsetX, x*(border + cardLength) + offsetY));
 
+	//添加底图
+	for (int i = 0; i < 16; i++)
+	{
+		auto x = i / 4;
+		auto y = i % 4;
+		auto sprite = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("blank.png"));
+		sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
+		sprite->setColor(Color3B::WHITE);
+		sprite->setAnchorPoint(cocos2d::Point(0, 0));
+		sprite->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
+		addChild(sprite);
 	}
+
+
+	//初始化2个卡片
+	m_lCards.clear();
+	AddNewCard();
+	AddNewCard();
 	//AddNewNum();
-    return true;
+	return true;
 }
 
 void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 {
-	if (keycode == EventKeyboard::KeyCode::KEY_BACKSPACE)
+	switch (keycode)
 	{
-		if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		{
-			Director::getInstance()->end();
-		}
-	}
-	else if (keycode == EventKeyboard::KeyCode::KEY_ESCAPE)
+	case EventKeyboard::KeyCode::KEY_BACKSPACE:
 	{
-		Director::getInstance()->end();
+												  if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+												  {
+													  Director::getInstance()->end();
+												  }
 	}
-	
+		break;
+	case EventKeyboard::KeyCode::KEY_ESCAPE:
+	{
+											   Director::getInstance()->end();
+	}
+		break;
+	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+	case EventKeyboard::KeyCode::KEY_UP_ARROW:
+	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+	{
+												   AddNewCard();
+	}
+	default:
+		break;
+	}
+
+
+
 }
 
-void HelloWorld::AddNewNum()
+Card* HelloWorld::FindCard(int x, int y)
+{
+	for (auto card : m_lCards)
+	{
+		cocos2d::Point& pt = card->GetPos();
+		if ((int)pt.x == x && (int)pt.y == y)
+			return card;
+	}
+	return nullptr;
+}
+
+void HelloWorld::AddNewCard()
 {
 	//计算剩余空卡
-	int num = 0;
-	std::vector<int> emptyCard;
-	emptyCard.reserve(16);
-	for (int i = 0; i < 4; i ++)
+	std::list<int> emptyCard;
+	static int allNum[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+	for (auto num : allNum)
 	{
-		int x = i / 4;
-		int y = i % 4;
-		if (m_Cards[x][y]->getNum() == 0)
-		{
-			num++;
-			emptyCard.push_back(i);
-		}
+		emptyCard.push_back(num);
 	}
-	if (num < 2)
+
+
+	for (auto card : m_lCards)
+	{
+		cocos2d::Point& pt = card->GetPos();
+		emptyCard.remove(int(pt.x * 4 + pt.y));
+	}
+
+	if (emptyCard.size() < 1)
 	{
 		//没有空间，失败
 	}
 	//随机选2个放置数字
-	auto first = rand() % num;
-	auto second = rand() % (num - 1);
-	
-	auto is2 = (rand() % 4) >= 1;
-	int x = emptyCard[first] / 4;
-	int y = emptyCard[first] % 4;
-	m_Cards[x][y]->setNum(is2 ? 2 : 4);
+	auto index = rand() % emptyCard.size();
 
-	is2 = (rand() % 4) >= 1;
-	if (second < first)
+	auto is2 = (rand() % 4) >= 1;
+	auto start = 0;
+	for (auto newCard : emptyCard)
 	{
-		x = emptyCard[second] / 4;
-		y = emptyCard[second] % 4;
+		if (start == index)
+		{
+			//计算卡片长宽以及位置
+			int x = newCard / 4;
+			int y = newCard % 4;
+			Card* card = Card::create(is2 ? 2 : 4, m_nCardLength);
+			addChild(card);
+			card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
+			card->GetPos().x = x;
+			card->GetPos().y = y;
+			m_lCards.push_back(card);
+			break;
+		}
+		start++;
 	}
-	else
-	{
-		x = emptyCard[second + 1] / 4;
-		y = emptyCard[second + 1] % 4;
-	}
-	m_Cards[x][y]->setNum(is2 ? 2 : 4);
+
+
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {
-    Director::getInstance()->end();
+	Director::getInstance()->end();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
+	exit(0);
 #endif
 }

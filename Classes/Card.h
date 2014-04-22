@@ -16,11 +16,13 @@ public:
 	static Card* create(int num,int length);
 
 	bool init(int length);
+	cocos2d::Point& GetPos(){ return m_iPos; }
 private:
 	Card();
 	~Card();
 
 	cocos2d::Sprite* m_pCardTex;	//ø®∆¨œ‘ æÕº∆¨
+	cocos2d::Point m_iPos;
 };
 
 #endif

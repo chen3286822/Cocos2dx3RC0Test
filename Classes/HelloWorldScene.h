@@ -19,13 +19,21 @@ public:
 	//接受返回键
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
 
-	void AddNewNum();
+	void AddNewCard();
+	Card* FindCard(int x,int y);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 
 private:
-	Card* m_Cards[4][4];
+	std::list<Card*> m_lCards;
+
+	//一些卡片相关的变量
+	int  m_nBorder{ 5 };		//卡片间距
+	int  m_nShorter;			//屏幕较短的一边
+	int  m_nCardLength;	//卡片边长
+	int  m_nOffsetX;			
+	int  m_nOffsetY;			
 };
 
 #endif // __HELLOWORLD_SCENE_H__
