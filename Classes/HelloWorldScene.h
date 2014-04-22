@@ -4,6 +4,18 @@
 #include "cocos2d.h"
 #include "Card.h"
 
+struct MoveCard
+{
+	Card* m_pCard;							
+	cocos2d::Point m_iMovePos;		//将要移动到的位置
+	bool m_bGoingMerge;				//是否会合并
+	MoveCard()
+	{
+		m_pCard = nullptr;
+		m_bGoingMerge = false;
+	}
+};
+
 class HelloWorld : public cocos2d::LayerColor
 {
 public:
@@ -26,7 +38,10 @@ public:
     CREATE_FUNC(HelloWorld);
 
 private:
-	std::list<Card*> m_lCards;
+	void MoveAndMergeCard(EventKeyboard::KeyCode dir);
+
+	MoveCard m_iCardPark[4][4];
+	//std::list<Card*> m_lCards;
 
 	//一些卡片相关的变量
 	int  m_nBorder{ 5 };		//卡片间距

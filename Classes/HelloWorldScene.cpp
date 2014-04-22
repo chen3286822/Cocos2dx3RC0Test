@@ -77,7 +77,7 @@ bool HelloWorld::init()
 
 
 	//初始化2个卡片
-	m_lCards.clear();
+	//m_lCards.clear();
 	AddNewCard();
 	AddNewCard();
 	//AddNewNum();
@@ -106,7 +106,8 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 	case EventKeyboard::KeyCode::KEY_UP_ARROW:
 	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 	{
-												   AddNewCard();
+												  // AddNewCard();
+												   MoveAndMergeCard(keycode);
 	}
 	default:
 		break;
@@ -116,14 +117,37 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 
 }
 
+void HelloWorld::MoveAndMergeCard(EventKeyboard::KeyCode dir)
+{
+	if (dir == EventKeyboard::KeyCode::KEY_RIGHT_ARROW)
+	{
+		int first[] = { 2, 1, 0 };
+		for (auto index : first)
+		{
+			for (auto i = 0; i < 4;i++)
+			{
+				Card* card = m_iCardPark[index][i].m_pCard;
+				if (card)
+				{
+					//移动合并算法
+				}
+			}			
+		}
+		
+	}
+}
+
 Card* HelloWorld::FindCard(int x, int y)
 {
-	for (auto card : m_lCards)
-	{
-		cocos2d::Point& pt = card->GetPos();
-		if ((int)pt.x == x && (int)pt.y == y)
-			return card;
-	}
+	if (m_iCardPark[x][y].m_pCard)
+		return m_iCardPark[x][y].m_pCard;
+
+// 	for (auto card : m_lCards)
+// 	{
+// 		cocos2d::Point& pt = card->GetPos();
+// 		if ((int)pt.x == x && (int)pt.y == y)
+// 			return card;
+// 	}
 	return nullptr;
 }
 
@@ -137,12 +161,23 @@ void HelloWorld::AddNewCard()
 		emptyCard.push_back(num);
 	}
 
-
-	for (auto card : m_lCards)
+	for (auto i = 0; i < 4; i ++)
 	{
-		cocos2d::Point& pt = card->GetPos();
-		emptyCard.remove(int(pt.x * 4 + pt.y));
+		for (auto j = 0; j < 4; j ++)
+		{
+			if (m_iCardPark[i][j].m_pCard)
+			{
+				cocos2d::Point& pt = m_iCardPark[i][j].m_pCard->GetPos();
+				emptyCard.remove(int(pt.x * 4 + pt.y));
+			}
+		}	
 	}
+	
+// 	for (auto card : m_lCards)
+// 	{
+// 		cocos2d::Point& pt = card->GetPos();
+// 		emptyCard.remove(int(pt.x * 4 + pt.y));
+// 	}
 
 	if (emptyCard.size() < 1)
 	{
@@ -165,7 +200,8 @@ void HelloWorld::AddNewCard()
 			card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
 			card->GetPos().x = x;
 			card->GetPos().y = y;
-			m_lCards.push_back(card);
+			m_iCardPark[x][y].m_pCard = card;
+			//m_lCards.push_back(card);
 			break;
 		}
 		start++;
