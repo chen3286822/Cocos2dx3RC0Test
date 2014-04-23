@@ -37,6 +37,7 @@ bool HelloWorld::init()
 	Point origin = Director::getInstance()->getVisibleOrigin();
 	m_nShorter = std::min(visibleSize.width, visibleSize.height);
 	m_nCardLength = (m_nShorter - m_nBorder * 5) / 4;
+	m_nRectLength = m_nBorder + m_nCardLength;
 	m_nOffsetX = m_nBorder + origin.x;
 	m_nOffsetY = (std::max(visibleSize.width, visibleSize.height) - m_nShorter) / 2 + origin.y;
 
@@ -71,16 +72,39 @@ bool HelloWorld::init()
 		sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
 		sprite->setColor(Color3B::WHITE);
 		sprite->setAnchorPoint(cocos2d::Point(0, 0));
-		sprite->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
+		sprite->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX, x*m_nRectLength + m_nOffsetY));
 		addChild(sprite);
+
+		auto label = LabelTTF::create("", "Arial", m_nCardLength / 2);
+		char temp[20];
+		sprintf(temp, "%d", i);
+		label->setString(temp);
+		label->setColor(Color3B::BLUE);
+		label->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX + m_nCardLength / 2, x*m_nRectLength + m_nOffsetY + m_nCardLength / 2));
+		addChild(label);
 	}
 
 
 	//初始化2个卡片
-	//m_lCards.clear();
-	AddNewCard();
-	AddNewCard();
-	//AddNewNum();
+  	//AddNewCard();
+ 	//AddNewCard();
+
+	auto x = 3, y = 0;
+	Card* card = Card::create(4, m_nCardLength);
+	addChild(card);
+	card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
+	card->GetPos().x = x;
+	card->GetPos().y = y;
+	m_iCardPark[x][y].m_pCard = card;
+	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
+	y = 1;
+	card = Card::create(2, m_nCardLength);
+	addChild(card);
+	card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
+	card->GetPos().x = x;
+	card->GetPos().y = y;
+	m_iCardPark[x][y].m_pCard = card;
+	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
 	return true;
 }
 
@@ -119,71 +143,201 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 
 void HelloWorld::MoveAndMergeCard(EventKeyboard::KeyCode dir)
 {
+
+	auto condition = [=](int Lformer1, int Lindex1, int Lformer2, int Lindex2) -> bool
+	{
+		if (dir == EventKeyboard::KeyCode::KEY_RIGHT_ARROW)
+			return (Lindex1 + Lformer1 <= 3);
+		else if (dir == EventKeyboard::KeyCode::KEY_LEFT_ARROW)
+			return (Lindex1 + Lformer1 >= 0);
+		else if (dir == EventKeyboard::KeyCode::KEY_UP_ARROW)
+			return (Lindex2 + Lformer2 <= 3);
+		else if (dir == EventKeyboard::KeyCode::KEY_DOWN_ARROW)
+			return (Lindex2 + Lformer2 >= 0);
+		return false;
+	};
+	auto minusPoint = [=]() -> cocos2d::Point
+	{
+		if (dir == EventKeyboard::KeyCode::KEY_RIGHT_ARROW)
+			return cocos2d::Point(0, -1);
+		else if (dir == EventKeyboard::KeyCode::KEY_LEFT_ARROW)
+			return cocos2d::Point(0, 1);
+		else if (dir == EventKeyboard::KeyCode::KEY_UP_ARROW)
+			return cocos2d::Point(-1, 0);
+		else if (dir == EventKeyboard::KeyCode::KEY_DOWN_ARROW)
+			return cocos2d::Point(1, 0);
+		return cocos2d::Point(0, 0);
+	};
+
+	std::vector<int> first;
+	std::vector<int> second;
 	if (dir == EventKeyboard::KeyCode::KEY_RIGHT_ARROW)
 	{
-		int first[] = { 2, 1, 0 };
-		for (auto index : first)
-		{
-			for (auto i = 0; i < 4;i++)
+		int firstCycle[] = { 2, 1, 0 };
+		int secondCycle[] = { 0, 1, 2, 3 };
+		first.assign(firstCycle, firstCycle + 3);
+		second.assign(secondCycle, secondCycle + 4);
+	}
+	else if (dir == EventKeyboard::KeyCode::KEY_LEFT_ARROW)
+	{
+		int firstCycle[] = { 1, 2, 3 };
+		int secondCycle[] = { 0, 1, 2, 3 };
+		first.assign(firstCycle, firstCycle + 3);
+		second.assign(secondCycle, secondCycle + 4);
+	}
+	else if (dir == EventKeyboard::KeyCode::KEY_UP_ARROW)
+	{
+		int firstCycle[] = { 0, 1, 2, 3 };
+		int secondCycle[] = { 2, 1, 0 };
+		first.assign(firstCycle, firstCycle + 4);
+		second.assign(secondCycle, secondCycle + 3);
+	}
+	else if (dir == EventKeyboard::KeyCode::KEY_DOWN_ARROW)
+	{
+		int firstCycle[] = { 0, 1, 2, 3 };
+		int secondCycle[] = { 1, 2, 3, };
+		first.assign(firstCycle, firstCycle + 4);
+		second.assign(secondCycle, secondCycle + 3);
+	}
+	for (auto index1 : first)
+	{
+		for (auto index2 : second)
+		{			
+			auto& moveCard = m_iCardPark[index2][index1];
+			auto card = moveCard.m_pCard;
+			if (card)
 			{
-				Card* card = m_iCardPark[index][i].m_pCard;
-				if (card)
+				//移动合并算法
+				auto former1 = 1, former2 = 0;
+				if (dir == EventKeyboard::KeyCode::KEY_LEFT_ARROW)
 				{
-					//移动合并算法
-					auto former = 1;
-					while (index + former <= 3)
+					former1 = -1;
+				}
+				else if (dir == EventKeyboard::KeyCode::KEY_UP_ARROW)
+				{
+					former1 = 0;
+					former2 = 1;
+				}
+				else if (dir == EventKeyboard::KeyCode::KEY_DOWN_ARROW)
+				{
+					former1 = 0;
+					former2 = -1;
+				}
+
+
+				while (condition(former1,index1,former2,index2))
+				{
+					//对于card之前的每个位置
+					//有卡则进入情况1，无卡继续下一次循环
+					//1、该卡是否合并中，是则进入a，否则进入b
+					//a、观察其m_iMovePos，将card移动到m_iMovePos之前的一个点
+					//b、观察其Num是否和card一致，是则将card移动到该位置，并且设置合并中，否则移动到之前的一个空位
+					auto& formerCard = m_iCardPark[index2 + former2][index1 + former1];
+					if (formerCard.m_pCard)
 					{
-						//对于card之前的每个位置
-						//有卡则进入情况1，无卡继续下一次循环
-						//1、该卡是否合并中，是则进入a，否则进入b
-						//a、观察其m_iMovePos，将card移动到m_iMovePos之前的一个点
-						//b、观察其Num是否和card一致，是则将card移动到该位置，并且设置合并中，否则移动到之前的一个空位
-						auto formerCard = m_iCardPark[former + index][i];
-						if (formerCard.m_pCard)
+						if (formerCard.m_bGoingMerge)
 						{
-							if (formerCard.m_bGoingMerge)
+							moveCard.m_iMovePos = formerCard.m_iMovePos + minusPoint();
+							auto doneAction = CallFunc::create(CC_CALLBACK_0(HelloWorld::RemoveMergedCardAndDoubleNum, this,index2,index1));
+							auto moveAction = MoveTo::create(0.5, cocos2d::Point(m_nRectLength*moveCard.m_iMovePos.y + m_nOffsetX, m_nRectLength*moveCard.m_iMovePos.x + m_nOffsetY));
+							auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
+							card->runAction(sequenceAction);
+						}
+						else
+						{
+							if (card->getNum() == formerCard.m_pCard->getNum())
 							{
-								m_iCardPark[index][i].m_iMovePos = cocos2d::Point(formerCard.m_iMovePos.x - 1, formerCard.m_iMovePos.y);
-								auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(m_iCardPark[index][i].m_iMovePos.x - card->GetPos().x), 0));
-								card->runAction(moveAction);				
+								moveCard.m_iMovePos = formerCard.m_iMovePos;
+								moveCard.m_bGoingMerge = true;
+								moveCard.m_nTag = 2;
+								formerCard.m_bGoingMerge = true;
+								formerCard.m_nTag = 1;
+								auto doneAction = CallFunc::create(CC_CALLBACK_0(HelloWorld::RemoveMergedCardAndDoubleNum, this, index2, index1));
+								auto moveAction = MoveTo::create(0.5, cocos2d::Point(m_nRectLength*moveCard.m_iMovePos.y + m_nOffsetX, m_nRectLength*moveCard.m_iMovePos.x + m_nOffsetY));
+								auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
+								card->runAction(sequenceAction);
 							}
 							else
 							{
-								if (card->getNum() == formerCard.m_pCard->getNum())
+								if ((dir == EventKeyboard::KeyCode::KEY_RIGHT_ARROW && (int)(formerCard.m_iMovePos.y - 1) != (int)card->GetPos().y) ||
+									(dir == EventKeyboard::KeyCode::KEY_LEFT_ARROW && (int)(formerCard.m_iMovePos.y + 1) != (int)card->GetPos().y) ||
+									(dir == EventKeyboard::KeyCode::KEY_UP_ARROW && (int)(formerCard.m_iMovePos.x - 1) != (int)card->GetPos().x) ||
+									(dir == EventKeyboard::KeyCode::KEY_DOWN_ARROW && (int)(formerCard.m_iMovePos.x + 1) != (int)card->GetPos().x))
 								{
-									m_iCardPark[index][i].m_iMovePos = cocos2d::Point(formerCard.m_iMovePos);
-									m_iCardPark[index][i].m_bGoingMerge = true;
-									formerCard.m_bGoingMerge = true;
-									auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(m_iCardPark[index][i].m_iMovePos.x - card->GetPos().x), 0));
-									card->runAction(moveAction);
-								}
-								else
-								{
-									if ((int)(formerCard.m_pCard->GetPos().x - 1) != (int)card->GetPos().x)
-									{
-										m_iCardPark[index][i].m_iMovePos = cocos2d::Point(formerCard.m_iMovePos.x - 1, formerCard.m_iMovePos.y);
-										auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(m_iCardPark[index][i].m_iMovePos.x - card->GetPos().x), 0));
-										card->runAction(moveAction);
-									}
+									moveCard.m_iMovePos = formerCard.m_iMovePos + minusPoint();
+									auto doneAction = CallFunc::create(CC_CALLBACK_0(HelloWorld::RemoveMergedCardAndDoubleNum, this, index2, index1));
+									auto moveAction = MoveTo::create(0.5, cocos2d::Point(m_nRectLength*moveCard.m_iMovePos.y + m_nOffsetX, m_nRectLength*moveCard.m_iMovePos.x + m_nOffsetY));
+									auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
+									card->runAction(sequenceAction);
 								}
 							}
-							break;
 						}
-						else
-							former++;
+						break;
 					}
-					//card前一直没有卡，则直接移动到最前位置
-					if (index + former > 3)
+					else
 					{
-						m_iCardPark[index][i].m_iMovePos = cocos2d::Point(3, i);
-						auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(3 - card->GetPos().x), 0));
-						card->runAction(moveAction);
+						if (dir == EventKeyboard::KeyCode::KEY_RIGHT_ARROW)
+							former1++;
+						else if (dir == EventKeyboard::KeyCode::KEY_LEFT_ARROW)
+							former1--;
+						else if (dir == EventKeyboard::KeyCode::KEY_UP_ARROW)
+							former2++;
+						else if (dir == EventKeyboard::KeyCode::KEY_DOWN_ARROW)
+							former2--;
 					}
 				}
-			}			
-		}
-		
+				//card前一直没有卡，则直接移动到最前位置
+				if (!condition(former1,index1,former2,index2))
+				{
+					if (dir == EventKeyboard::KeyCode::KEY_RIGHT_ARROW)
+						moveCard.m_iMovePos = cocos2d::Point(index2, 3);
+					else if (dir == EventKeyboard::KeyCode::KEY_LEFT_ARROW)
+						moveCard.m_iMovePos = cocos2d::Point(index2, 0);
+					else if (dir == EventKeyboard::KeyCode::KEY_UP_ARROW)
+						moveCard.m_iMovePos = cocos2d::Point(3, index1);
+					else if (dir == EventKeyboard::KeyCode::KEY_DOWN_ARROW)
+						moveCard.m_iMovePos = cocos2d::Point(0, index1);
+					
+					auto doneAction = CallFunc::create(CC_CALLBACK_0(HelloWorld::RemoveMergedCardAndDoubleNum, this, index2, index1));
+					auto moveAction = MoveTo::create(0.5, cocos2d::Point(m_nRectLength*moveCard.m_iMovePos.y + m_nOffsetX, m_nRectLength*moveCard.m_iMovePos.x + m_nOffsetY));
+					auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
+					card->runAction(sequenceAction);
+				}
+			}
+		}			
 	}
+
+}
+
+
+void HelloWorld::RemoveMergedCardAndDoubleNum(int x, int y)
+{
+	auto& moveCard = m_iCardPark[x][y];
+	if (moveCard.m_nTag == 1)
+	{
+		moveCard.m_bGoingMerge = false;
+		moveCard.m_nTag = 0;
+		moveCard.m_iMovePos = cocos2d::Point(0, 0);
+		this->removeChild(moveCard.m_pCard);
+		moveCard.m_pCard = nullptr;
+	}
+	else if (moveCard.m_nTag == 2 || moveCard.m_nTag == 0)
+	{
+		auto& movedCard = m_iCardPark[(int)moveCard.m_iMovePos.x][(int)moveCard.m_iMovePos.y];
+		movedCard.m_bGoingMerge = false;
+		movedCard.m_nTag = 0;
+		movedCard.m_iMovePos = moveCard.m_iMovePos;
+		movedCard.m_pCard = moveCard.m_pCard;
+
+		if (moveCard.m_nTag == 2)
+			movedCard.m_pCard->setNum(movedCard.m_pCard->getNum() * 2);
+
+		moveCard.m_bGoingMerge = false;
+		moveCard.m_nTag = 0;
+		moveCard.m_iMovePos = cocos2d::Point(0, 0);
+		moveCard.m_pCard = nullptr;
+	}
+	
 }
 
 Card* HelloWorld::FindCard(int x, int y)
@@ -250,6 +404,7 @@ void HelloWorld::AddNewCard()
 			card->GetPos().x = x;
 			card->GetPos().y = y;
 			m_iCardPark[x][y].m_pCard = card;
+			m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
 			//m_lCards.push_back(card);
 			break;
 		}
