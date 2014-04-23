@@ -130,6 +130,55 @@ void HelloWorld::MoveAndMergeCard(EventKeyboard::KeyCode dir)
 				if (card)
 				{
 					//移动合并算法
+					auto former = 1;
+					while (index + former <= 3)
+					{
+						//对于card之前的每个位置
+						//有卡则进入情况1，无卡继续下一次循环
+						//1、该卡是否合并中，是则进入a，否则进入b
+						//a、观察其m_iMovePos，将card移动到m_iMovePos之前的一个点
+						//b、观察其Num是否和card一致，是则将card移动到该位置，并且设置合并中，否则移动到之前的一个空位
+						auto formerCard = m_iCardPark[former + index][i];
+						if (formerCard.m_pCard)
+						{
+							if (formerCard.m_bGoingMerge)
+							{
+								m_iCardPark[index][i].m_iMovePos = cocos2d::Point(formerCard.m_iMovePos.x - 1, formerCard.m_iMovePos.y);
+								auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(m_iCardPark[index][i].m_iMovePos.x - card->GetPos().x), 0));
+								card->runAction(moveAction);				
+							}
+							else
+							{
+								if (card->getNum() == formerCard.m_pCard->getNum())
+								{
+									m_iCardPark[index][i].m_iMovePos = cocos2d::Point(formerCard.m_iMovePos);
+									m_iCardPark[index][i].m_bGoingMerge = true;
+									formerCard.m_bGoingMerge = true;
+									auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(m_iCardPark[index][i].m_iMovePos.x - card->GetPos().x), 0));
+									card->runAction(moveAction);
+								}
+								else
+								{
+									if ((int)(formerCard.m_pCard->GetPos().x - 1) != (int)card->GetPos().x)
+									{
+										m_iCardPark[index][i].m_iMovePos = cocos2d::Point(formerCard.m_iMovePos.x - 1, formerCard.m_iMovePos.y);
+										auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(m_iCardPark[index][i].m_iMovePos.x - card->GetPos().x), 0));
+										card->runAction(moveAction);
+									}
+								}
+							}
+							break;
+						}
+						else
+							former++;
+					}
+					//card前一直没有卡，则直接移动到最前位置
+					if (index + former > 3)
+					{
+						m_iCardPark[index][i].m_iMovePos = cocos2d::Point(3, i);
+						auto moveAction = MoveTo::create(0.5, cocos2d::Point((m_nBorder + m_nCardLength)*(3 - card->GetPos().x), 0));
+						card->runAction(moveAction);
+					}
 				}
 			}			
 		}

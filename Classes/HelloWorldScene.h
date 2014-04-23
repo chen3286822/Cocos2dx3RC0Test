@@ -38,7 +38,7 @@ public:
     CREATE_FUNC(HelloWorld);
 
 private:
-	void MoveAndMergeCard(EventKeyboard::KeyCode dir);
+	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
 
 	MoveCard m_iCardPark[4][4];
 	//std::list<Card*> m_lCards;
