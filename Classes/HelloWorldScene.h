@@ -10,11 +10,13 @@ struct MoveCard
 	cocos2d::Point m_iMovePos;		//将要移动到的位置
 	bool m_bGoingMerge;				//是否会合并
 	int m_nTag;									//标记是否为被合并卡片，0表示没有合并，1表示该卡片要被后面的合并，2表示该卡片将要去合并某卡片，用于标记删除被合并卡片，翻倍合并卡片
+	bool m_bMoving;						//是否移动中
 	MoveCard()
 	{
 		m_pCard = nullptr;
 		m_bGoingMerge = false;
 		m_nTag = 0;
+		m_bMoving = false;
 	}
 };
 
@@ -41,7 +43,8 @@ public:
 
 private:
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
-	void RemoveMergedCardAndDoubleNum(int x,int y);
+	void RemoveMergedCardAndDoubleNum(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
+	void MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
 
 	MoveCard m_iCardPark[4][4];
 	//std::list<Card*> m_lCards;
