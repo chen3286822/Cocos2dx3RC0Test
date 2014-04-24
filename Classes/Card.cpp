@@ -37,6 +37,63 @@ void Card::setNum(int var)
 		char temp[50];
 		sprintf(temp, "%d", m_nNum);
 		label->setString(temp);
+		switch (m_nNum)
+		{
+		case 2:
+		{
+				  m_pCardTex->setColor(Color3B(238, 228, 218));
+				  label->setColor(Color3B(124,115,106));
+		}
+			break;
+		case 4:
+		{
+				  m_pCardTex->setColor(Color3B(236, 224, 200));
+				  label->setColor(Color3B(124, 115, 106));
+		}
+			break;
+		case 8:
+		{
+				  m_pCardTex->setColor(Color3B(242, 177, 121));
+				  label->setColor(Color3B(255, 247, 235));
+		}
+			break;
+		case 16:
+		{
+				  m_pCardTex->setColor(Color3B(245, 149, 99));
+				  label->setColor(Color3B(255, 247, 235));
+		}
+			break;
+		case 32:
+		{
+				   m_pCardTex->setColor(Color3B(245, 124, 95));
+				   label->setColor(Color3B(255, 247, 235));
+		}
+			break;
+		case 64:
+		{
+				   m_pCardTex->setColor(Color3B(246, 93, 59));
+				   label->setColor(Color3B(255, 247, 235));
+		}
+			break;
+		case 128:
+		{
+				   m_pCardTex->setColor(Color3B(237, 206, 113));
+				   label->setColor(Color3B(255, 247, 235));
+		}
+			break;
+		case 256:
+		{
+					m_pCardTex->setColor(Color3B(236, 200, 80));
+					label->setColor(Color3B(255, 247, 235));
+		}
+			break;
+		default:
+		{
+				   m_pCardTex->setColor(Color3B(236, 200, 80));
+				   label->setColor(Color3B(255, 247, 235));
+		}
+			break;
+		}
 	}
 }
 

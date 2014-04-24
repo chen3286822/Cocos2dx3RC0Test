@@ -22,7 +22,7 @@ bool HelloWorld::init()
 {
 	//////////////////////////////
 	// 1. super init first
-	if (!LayerColor::initWithColor(Color4B::GRAY))
+	if (!LayerColor::initWithColor(Color4B(184,175,158,255)))
 	{
 		return false;
 	}
@@ -70,18 +70,18 @@ bool HelloWorld::init()
 		auto y = i % 4;
 		auto sprite = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("blank.png"));
 		sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
-		sprite->setColor(Color3B::WHITE);
+		sprite->setColor(Color3B(204,192,178));
 		sprite->setAnchorPoint(cocos2d::Point(0, 0));
 		sprite->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX, x*m_nRectLength + m_nOffsetY));
 		addChild(sprite);
 
-		auto label = LabelTTF::create("", "Arial", m_nCardLength / 2);
-		char temp[20];
-		sprintf(temp, "%d", i);
-		label->setString(temp);
-		label->setColor(Color3B::BLUE);
-		label->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX + m_nCardLength / 2, x*m_nRectLength + m_nOffsetY + m_nCardLength / 2));
-		addChild(label);
+// 		auto label = LabelTTF::create("", "Arial", m_nCardLength / 2);
+// 		char temp[20];
+// 		sprintf(temp, "%d", i);
+// 		label->setString(temp);
+// 		label->setColor(Color3B::BLUE);
+// 		label->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX + m_nCardLength / 2, x*m_nRectLength + m_nOffsetY + m_nCardLength / 2));
+// 		addChild(label);
 	}
 
 
@@ -132,6 +132,16 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 	{
 												  // AddNewCard();
+												   for (auto i = 0; i < 16; i++)
+												   {
+													   if (m_iCardPark[i / 4][i % 4].m_pCard)
+													   {
+														   if (m_iCardPark[i / 4][i % 4].m_bMoving)
+														   {
+															   return;
+														   }
+													   }
+												   }
 												   MoveAndMergeCard(keycode);
 	}
 	default:
@@ -151,7 +161,7 @@ void HelloWorld::MoveAction(int x, int y,cocos2d::EventKeyboard::KeyCode dir)
 		if ((int)moveCard.m_iMovePos.x == (int)moveCard.m_pCard->GetPos().x && (int)moveCard.m_iMovePos.y == (int)moveCard.m_pCard->GetPos().y)
 			return;
 		auto doneAction = CallFunc::create(CC_CALLBACK_0(HelloWorld::RemoveMergedCardAndDoubleNum, this, x, y,dir));
-		auto moveAction = MoveTo::create(0.5, cocos2d::Point(m_nRectLength*moveCard.m_iMovePos.y + m_nOffsetX, m_nRectLength*moveCard.m_iMovePos.x + m_nOffsetY));
+		auto moveAction = MoveTo::create(0.15f, cocos2d::Point(m_nRectLength*moveCard.m_iMovePos.y + m_nOffsetX, m_nRectLength*moveCard.m_iMovePos.x + m_nOffsetY));
 		auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
 		moveCard.m_pCard->runAction(sequenceAction);
 		moveCard.m_bMoving = true;
