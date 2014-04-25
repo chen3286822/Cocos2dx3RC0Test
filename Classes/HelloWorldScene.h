@@ -23,6 +23,10 @@ struct MoveCard
 class HelloWorld : public cocos2d::LayerColor
 {
 public:
+	enum eChild
+	{
+		eChild_Point,
+	};
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene();
 
@@ -37,6 +41,7 @@ public:
 
 	void AddNewCard();
 	Card* FindCard(int x,int y);
+	void Restart(cocos2d::Ref* pSender);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
@@ -45,9 +50,11 @@ private:
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
 	void RemoveMergedCardAndDoubleNum(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
 	void MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
+	void AddPoint(int pt);
+	void CheckFailure();
 
 	MoveCard m_iCardPark[4][4];
-	//std::list<Card*> m_lCards;
+	int m_nPoint{ 0 };				//得分
 
 	//一些卡片相关的变量
 	int  m_nBorder{ 5 };		//卡片间距

@@ -54,13 +54,33 @@ bool HelloWorld::init()
 	closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
 		origin.y + closeItem->getContentSize().height / 2));
 
-	// create menu, it's an autorelease object
-	auto menu = Menu::create(closeItem, NULL);
+	auto labelRestart = LabelTTF::create("New Game", "Arial", 20);
+	labelRestart->setColor(Color3B(249,246,242));
+	auto restartItem = MenuItemLabel::create(labelRestart, CC_CALLBACK_1(HelloWorld::Restart, this));
+	restartItem->setAnchorPoint(Point(1, 0));
+	restartItem->setPosition(Point(m_nOffsetX + 4 * m_nRectLength - m_nBorder, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
+
+	auto menu = Menu::create(closeItem, restartItem, NULL);
 	menu->setPosition(Point::ZERO);
 	this->addChild(menu, 1);
 
-	/////////////////////////////
-	// 3. add your codes below...
+	auto label = LabelTTF::create("", "Arial", m_nCardLength / 4);
+	char temp[20];
+	sprintf(temp, "Score:");
+	label->setString(temp);
+	label->setColor(Color3B::WHITE);
+	label->setAnchorPoint(cocos2d::Point(0, 0));
+	label->setPosition(cocos2d::Point(m_nOffsetX, 4 * m_nRectLength + m_nOffsetY + m_nBorder));
+	addChild(label);
+
+	auto labelPt = LabelTTF::create("", "Arial", m_nCardLength / 4);
+	sprintf(temp, "%d", m_nPoint);
+	labelPt->setString(temp);
+	labelPt->setColor(Color3B::WHITE);
+	labelPt->setAnchorPoint(cocos2d::Point(0, 0));
+	labelPt->setPosition(cocos2d::Point(m_nOffsetX + label->getContentSize().width , 4 * m_nRectLength + m_nOffsetY + m_nBorder));
+	addChild(labelPt,1,eChild_Point);
+
 	Director::getInstance()->getTextureCache()->addImage("blank.png");
 
 	//添加底图
@@ -86,27 +106,32 @@ bool HelloWorld::init()
 
 
 	//初始化2个卡片
- // 	AddNewCard();
-// 	AddNewCard();
+  	AddNewCard();
+ 	AddNewCard();
 
-	auto x = 0, y = 2;
-	Card* card = Card::create(4, m_nCardLength);
-	addChild(card);
-	card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
-	card->GetPos().x = x;
-	card->GetPos().y = y;
-	m_iCardPark[x][y].m_pCard = card;
-	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
-	x = 1;
-	y = 2;
-	card = Card::create(2, m_nCardLength);
-	addChild(card);
-	card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
-	card->GetPos().x = x;
-	card->GetPos().y = y;
-	m_iCardPark[x][y].m_pCard = card;
-	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
+// 	auto x = 0, y = 2;
+// 	Card* card = Card::create(4, m_nCardLength);
+// 	addChild(card);
+// 	card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
+// 	card->GetPos().x = x;
+// 	card->GetPos().y = y;
+// 	m_iCardPark[x][y].m_pCard = card;
+// 	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
+// 	x = 1;
+// 	y = 2;
+// 	card = Card::create(2, m_nCardLength);
+// 	addChild(card);
+// 	card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
+// 	card->GetPos().x = x;
+// 	card->GetPos().y = y;
+// 	m_iCardPark[x][y].m_pCard = card;
+// 	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
 	return true;
+}
+
+void HelloWorld::Restart(cocos2d::Ref* pSender)
+{
+	Director::getInstance()->replaceScene(HelloWorld::createScene());
 }
 
 void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
@@ -404,7 +429,10 @@ void HelloWorld::RemoveMergedCardAndDoubleNum(int x, int y, EventKeyboard::KeyCo
 				movedCard.m_pCard->GetPos() = movedCard.m_iMovePos;
 
 				if (moveCard.m_nTag == 2)
-					movedCard.m_pCard->setNum(movedCard.m_pCard->getNum() * 2);
+				{				
+					movedCard.m_pCard->setNum(movedCard.m_pCard->getNum() * 2,false);		
+					AddPoint(movedCard.m_pCard->getNum());
+				}
 
 				moveCard.m_bGoingMerge = false;
 				moveCard.m_nTag = 0;
@@ -419,15 +447,24 @@ void HelloWorld::RemoveMergedCardAndDoubleNum(int x, int y, EventKeyboard::KeyCo
 	}
 	
 	AddNewCard();
-// 	auto x1 = 0;
-// 	auto y1 = 0;
-// 	auto card = Card::create(4, m_nCardLength);
-// 	addChild(card);
-// 	card->setPosition(cocos2d::Point(y1*(m_nBorder + m_nCardLength) + m_nOffsetX, x1*(m_nBorder + m_nCardLength) + m_nOffsetY));
-// 	card->GetPos().x = x1;
-// 	card->GetPos().y = y1;
-// 	m_iCardPark[x1][y1].m_pCard = card;
-// 	m_iCardPark[x1][y1].m_iMovePos = cocos2d::Point(card->GetPos());
+}
+
+void HelloWorld::AddPoint(int pt)
+{
+	m_nPoint += pt;
+	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_Point));
+	if (label)
+	{
+		char temp[20];
+		sprintf(temp, "%d", m_nPoint);
+		label->setString(temp);
+
+		float _originalScale = label->getScale();
+		auto zoomAction1 = ScaleTo::create(0.2f, _originalScale * 1.4f);
+		auto zoomAction2 = ScaleTo::create(0.2f, _originalScale);
+		auto sequenceAction = Sequence::create(zoomAction1, zoomAction2, NULL);
+		label->runAction(sequenceAction);
+	}
 }
 
 Card* HelloWorld::FindCard(int x, int y)
@@ -475,6 +512,7 @@ void HelloWorld::AddNewCard()
 	if (emptyCard.size() < 1)
 	{
 		//没有空间，失败
+		return;
 	}
 	//随机选2个放置数字
 	auto index = rand() % emptyCard.size();
@@ -501,7 +539,36 @@ void HelloWorld::AddNewCard()
 		start++;
 	}
 
+	//检测是否无路可走
+	//没有空位时才会检测
+	if (emptyCard.size() -1 <= 0)
+		CheckFailure();
+}
 
+void HelloWorld::CheckFailure()
+{
+	//检查所有格子的上下左右，如果存在数字和自己一样的，则不会失败
+	for (auto i = 0; i < 4; i ++)
+	{
+		for (auto j = 0; j < 4; j ++)
+		{
+			MoveCard& moveCard = m_iCardPark[i][j];
+			int x[4] = { -1, 1, 0, 0 };
+			int y[4] = { 0, 0, 1, -1 };
+			for (auto index = 0; index < 4; index++)
+			{
+				auto x1 = x[index] + i;
+				auto y1 = y[index] + j;
+				if (x1 < 0 || x1 > 3 || y1 < 0 || y1 > 3)
+					continue;
+				MoveCard& nerghbourCard = m_iCardPark[x1][y1];
+				if (moveCard.m_pCard->getNum() == nerghbourCard.m_pCard->getNum())
+					return;
+			}		
+		}		
+	}
+	//游戏失败
+	CCLOG("Game Over!");
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender)

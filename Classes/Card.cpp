@@ -28,7 +28,7 @@ Card::~Card()
 	//CC_SAFE_RELEASE(m_pCardTex);
 }
 
-void Card::setNum(int var)
+void Card::setNum(int var, bool initNum)
 {
 	m_nNum = var;
 	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_Label));
@@ -87,12 +87,38 @@ void Card::setNum(int var)
 					label->setColor(Color3B(255, 247, 235));
 		}
 			break;
+		case 512:
+		{
+					m_pCardTex->setColor(Color3B(237, 200, 80));
+					label->setColor(Color3B(249, 246, 242));
+		}
+			break;
+		case 1024:
+		{
+					m_pCardTex->setColor(Color3B(0, 122, 204));
+					label->setColor(Color3B(249, 246, 242));
+		}
+			break;
+		case 2048:
+		{
+					 m_pCardTex->setColor(Color3B(185, 117, 181));
+					 label->setColor(Color3B(255, 216, 0));
+		}
+			break;
 		default:
 		{
 				   m_pCardTex->setColor(Color3B(236, 200, 80));
 				   label->setColor(Color3B(255, 247, 235));
 		}
 			break;
+		}
+		if (!initNum)
+		{
+			float _originalScale = label->getScale();
+			auto zoomAction1 = ScaleTo::create(0.1f, _originalScale * 1.2f);
+			auto zoomAction2 = ScaleTo::create(0.1f, _originalScale);
+			auto sequenceAction = Sequence::create(zoomAction1, zoomAction2, NULL);
+			label->runAction(sequenceAction);
 		}
 	}
 }
