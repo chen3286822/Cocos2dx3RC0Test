@@ -1,4 +1,5 @@
 #include "HelloWorldScene.h"
+#include "Dialog.h"
 
 USING_NS_CC;
 
@@ -31,6 +32,14 @@ bool HelloWorld::init()
 	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
+	// Register Touch Event
+	auto listener2 = EventListenerTouchOneByOne::create();
+	listener2->setSwallowTouches(true);
+	listener2->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+	listener2->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
+	listener2->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2, this);
+
 	srand((unsigned int)time(NULL));
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -54,7 +63,7 @@ bool HelloWorld::init()
 	closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
 		origin.y + closeItem->getContentSize().height / 2));
 
-	auto labelRestart = LabelTTF::create("New Game", "Arial", 20);
+	auto labelRestart = LabelTTF::create("New Game", "Arial", 25);
 	labelRestart->setColor(Color3B(249,246,242));
 	auto restartItem = MenuItemLabel::create(labelRestart, CC_CALLBACK_1(HelloWorld::Restart, this));
 	restartItem->setAnchorPoint(Point(1, 0));
@@ -93,7 +102,7 @@ bool HelloWorld::init()
 		sprite->setColor(Color3B(204,192,178));
 		sprite->setAnchorPoint(cocos2d::Point(0, 0));
 		sprite->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX, x*m_nRectLength + m_nOffsetY));
-		addChild(sprite);
+		addChild(sprite,1);
 
 // 		auto label = LabelTTF::create("", "Arial", m_nCardLength / 2);
 // 		char temp[20];
@@ -126,6 +135,13 @@ bool HelloWorld::init()
 // 	card->GetPos().y = y;
 // 	m_iCardPark[x][y].m_pCard = card;
 // 	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
+// 	auto dialog = Dialog::create();
+// 	dialog->SetTitle("Game Over");
+// 	//char temp[255];
+// 	sprintf(temp, "You got %d points!", m_nPoint);
+// 	dialog->SetContent(temp);
+// 	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
+// 	addChild(dialog);
 	return true;
 }
 
@@ -175,6 +191,37 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 
 
 
+}
+
+bool HelloWorld::onTouchBegan(Touch* touch, Event* event)
+{
+	m_iStartPt = touch->getLocation();
+	return true;
+}
+
+void HelloWorld::onTouchMoved(Touch* touch, Event* event)
+{
+
+}
+
+void HelloWorld::onTouchEnded(Touch* touch, Event* event)
+{
+	Point endPt = touch->getLocation();
+	if (abs(m_iStartPt.x - endPt.x) > abs(m_iStartPt.y - endPt.y) && abs(m_iStartPt.x - endPt.x) > 50)
+	{
+		if (m_iStartPt.x > endPt.x)
+			MoveAndMergeCard(EventKeyboard::KeyCode::KEY_LEFT_ARROW);
+		else 
+			MoveAndMergeCard(EventKeyboard::KeyCode::KEY_RIGHT_ARROW);
+	}
+	else if (abs(m_iStartPt.x - endPt.x) <= abs(m_iStartPt.y - endPt.y) && abs(m_iStartPt.y - endPt.y) > 50)
+	{
+		if (m_iStartPt.y > endPt.y)
+			MoveAndMergeCard(EventKeyboard::KeyCode::KEY_DOWN_ARROW);
+		else
+			MoveAndMergeCard(EventKeyboard::KeyCode::KEY_UP_ARROW);
+	}
+	
 }
 
 void HelloWorld::MoveAction(int x, int y,cocos2d::EventKeyboard::KeyCode dir)
@@ -459,6 +506,10 @@ void HelloWorld::AddPoint(int pt)
 		sprintf(temp, "%d", m_nPoint);
 		label->setString(temp);
 
+		//先恢复默认scale，否则快速加分，会导致之前scale没有恢复，但是又执行放大动作，导致分数越来越大
+		label->stopAllActions();
+		label->setScale(1.0f);
+
 		float _originalScale = label->getScale();
 		auto zoomAction1 = ScaleTo::create(0.2f, _originalScale * 1.4f);
 		auto zoomAction2 = ScaleTo::create(0.2f, _originalScale);
@@ -527,7 +578,7 @@ void HelloWorld::AddNewCard()
 			int x = newCard / 4;
 			int y = newCard % 4;
 			Card* card = Card::create(is2 ? 2 : 4, m_nCardLength);
-			addChild(card);
+			addChild(card,2);
 			card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) + m_nOffsetX, x*(m_nBorder + m_nCardLength) + m_nOffsetY));
 			card->GetPos().x = x;
 			card->GetPos().y = y;
@@ -569,6 +620,13 @@ void HelloWorld::CheckFailure()
 	}
 	//游戏失败
 	CCLOG("Game Over!");
+	auto dialog = Dialog::create();
+	dialog->SetTitle("Game Over");
+	char temp[255];
+	sprintf(temp, "You got %d points!", m_nPoint);
+	dialog->SetContent(temp);
+	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
+	addChild(dialog,3);
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender)

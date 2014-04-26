@@ -39,6 +39,11 @@ public:
 	//接受返回键
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
 
+	//触摸控制
+	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
+	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+
 	void AddNewCard();
 	Card* FindCard(int x,int y);
 	void Restart(cocos2d::Ref* pSender);
@@ -63,6 +68,8 @@ private:
 	int  m_nRectLength;	//卡片+间距长
 	int  m_nOffsetX;			
 	int  m_nOffsetY;			
+
+	cocos2d::Point m_iStartPt;			//记录每次开始触摸的开始点坐标，用于判断滑动方向
 };
 
 #endif // __HELLOWORLD_SCENE_H__
