@@ -141,7 +141,7 @@ bool HelloWorld::init()
 // 	sprintf(temp, "You got %d points!", m_nPoint);
 // 	dialog->SetContent(temp);
 // 	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
-// 	addChild(dialog);
+// 	addChild(dialog,2);
 	return true;
 }
 

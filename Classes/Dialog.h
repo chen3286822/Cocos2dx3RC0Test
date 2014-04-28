@@ -19,6 +19,12 @@ public:
 	virtual void onEnter();
 	virtual void onExit();
 
+	//´¥Ãþ¿ØÖÆ
+	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
+	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+	void onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event);
+
 	void AddButton(const char* text, const cocos2d::ccMenuCallback& callback);
 	void SetTitle(std::string title);
 	void SetContent(std::string content);
@@ -26,6 +32,10 @@ private:
 	std::string m_strTitle;
 	std::string m_strContent;
 	VTextButton m_vButtons;
+	cocos2d::Menu* m_pMenu;
+	bool m_bMenuTouched{ false };
+
+	cocos2d::EventListenerTouchOneByOne* m_pTouchListener{nullptr};
 };
 
 #endif
