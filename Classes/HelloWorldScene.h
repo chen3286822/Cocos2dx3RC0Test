@@ -59,6 +59,7 @@ private:
 	void CheckFailure();
 
 	MoveCard m_iCardPark[4][4];
+	int m_nHighScore;				//历史最高得分
 	int m_nPoint{ 0 };				//得分
 
 	//一些卡片相关的变量

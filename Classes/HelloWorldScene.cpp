@@ -28,6 +28,8 @@ bool HelloWorld::init()
 		return false;
 	}
 
+	m_nHighScore = UserDefault::getInstance()->getIntegerForKey("Score", 0);
+
 	auto listener = EventListenerKeyboard::create();
 	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
@@ -623,7 +625,17 @@ void HelloWorld::CheckFailure()
 	auto dialog = Dialog::create();
 	dialog->SetTitle("Game Over");
 	char temp[255];
-	sprintf(temp, "You got %d points!", m_nPoint);
+	if (m_nPoint > m_nHighScore)
+	{
+		sprintf(temp, "A new record! You got %d points!", m_nPoint);
+		m_nHighScore = m_nPoint;
+		UserDefault::getInstance()->setIntegerForKey("Score", m_nHighScore);
+	}
+	else
+	{
+		sprintf(temp, "You got %d points!\nBest record is %dpts.", m_nPoint,m_nHighScore);
+	}
+	
 	dialog->SetContent(temp);
 	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
 	addChild(dialog,3);
