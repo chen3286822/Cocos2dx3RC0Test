@@ -2,6 +2,9 @@
 #define __DIALOG_H__
 
 #include "cocos2d.h"
+#include "extensions/cocos-ext.h"
+#include "ui/CocosGUI.h"
+#include "cocostudio/CocoStudio.h"
 
 struct TextButton
 {
@@ -25,6 +28,8 @@ public:
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event);
 
+	void touchEvent(cocos2d::Ref *pSender, cocos2d::ui::TouchEventType type);
+
 	void AddButton(const char* text, const cocos2d::ccMenuCallback& callback);
 	void SetTitle(std::string title);
 	void SetContent(std::string content);
@@ -35,7 +40,9 @@ private:
 	cocos2d::Menu* m_pMenu;
 	bool m_bMenuTouched{ false };
 
-	cocos2d::EventListenerTouchOneByOne* m_pTouchListener{nullptr};
+	cocos2d::EventListenerTouchOneByOne* m_pTouchListener{ nullptr };
+
+	cocos2d::ui::Layout* m_pLayout{ nullptr };
 };
 
 #endif

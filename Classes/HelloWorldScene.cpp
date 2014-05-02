@@ -137,13 +137,13 @@ bool HelloWorld::init()
 // 	card->GetPos().y = y;
 // 	m_iCardPark[x][y].m_pCard = card;
 // 	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
-// 	auto dialog = Dialog::create();
-// 	dialog->SetTitle("Game Over");
-// 	//char temp[255];
-// 	sprintf(temp, "You got %d points!", m_nPoint);
-// 	dialog->SetContent(temp);
-// 	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
-// 	addChild(dialog,2);
+	auto dialog = Dialog::create();
+	dialog->SetTitle("Game Over");
+	//char temp[255];
+	sprintf(temp, "You got %d points!", m_nPoint);
+	dialog->SetContent(temp);
+	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
+	addChild(dialog,2);
 	return true;
 }
 
