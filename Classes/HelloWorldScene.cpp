@@ -57,13 +57,13 @@ bool HelloWorld::init()
 	//    you may modify it.
 
 	// add a "close" icon to exit the progress. it's an autorelease object
-	auto closeItem = MenuItemImage::create(
-		"CloseNormal.png",
-		"CloseSelected.png",
-		CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-
-	closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
-		origin.y + closeItem->getContentSize().height / 2));
+// 	auto closeItem = MenuItemImage::create(
+// 		"CloseNormal.png",
+// 		"CloseSelected.png",
+// 		CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
+// 
+// 	closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
+// 		origin.y + closeItem->getContentSize().height / 2));
 
 	auto labelRestart = LabelTTF::create("New Game", "Arial", 25);
 	labelRestart->setColor(Color3B(249,246,242));
@@ -71,7 +71,7 @@ bool HelloWorld::init()
 	restartItem->setAnchorPoint(Point(1, 0));
 	restartItem->setPosition(Point(m_nOffsetX + 4 * m_nRectLength - m_nBorder, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
 
-	auto menu = Menu::create(closeItem, restartItem, NULL);
+	auto menu = Menu::create(restartItem, NULL);
 	menu->setPosition(Point::ZERO);
 	this->addChild(menu, 1);
 
@@ -629,7 +629,7 @@ void HelloWorld::CheckFailure()
 	if (m_nPoint > m_nHighScore)
 	{
 		dialog->setNewRecord(true);
-		sprintf(temp, "A new record! You got %d points!", m_nPoint);
+		sprintf(temp, "A new record!\nYou got %d points!", m_nPoint);
 		m_nHighScore = m_nPoint;
 		UserDefault::getInstance()->setIntegerForKey("Score", m_nHighScore);
 	}
@@ -643,11 +643,11 @@ void HelloWorld::CheckFailure()
 	addChild(dialog,3);
 }
 
-void HelloWorld::menuCloseCallback(Ref* pSender)
-{
-	Director::getInstance()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-	exit(0);
-#endif
-}
+// void HelloWorld::menuCloseCallback(Ref* pSender)
+// {
+// 	Director::getInstance()->end();
+// 
+// #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+// 	exit(0);
+// #endif
+// }
