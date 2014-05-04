@@ -217,3 +217,10 @@ pip-log.txt
 .mr.developer.cfg
 proj.android/gen/R.java.d
 cocos2d/cocos/2d/platform/android/java/gen/R.java.d
+/cocos2d/cocos/2d/Release.win32/libcocos2d.tlog
+/proj.win32/Release.win32
+/cocos2d/external/chipmunk/proj.win32/Release.win32/libchipmunk.tlog
+/cocos2d/extensions/proj.win32/Release.win32/libExtensions.tlog
+/cocos2d/cocos/audio/proj.win32/Release.win32/libAudio.tlog
+/cocos2d/cocos/editor-support/cocostudio/proj.win32/Release.win32/libCocosStudio.tlog
+/cocos2d/cocos/ui/proj.win32/Release.win32/libGUI.tlog
