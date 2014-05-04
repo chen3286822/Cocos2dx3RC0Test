@@ -15,6 +15,7 @@ typedef std::vector<TextButton> VTextButton;
 
 class Dialog : public cocos2d::LayerColor
 {
+	CC_SYNTHESIZE(bool, m_bNewRecord, NewRecord);
 public:
 	CREATE_FUNC(Dialog);
 
@@ -37,8 +38,8 @@ private:
 	std::string m_strTitle;
 	std::string m_strContent;
 	VTextButton m_vButtons;
-	cocos2d::Menu* m_pMenu;
-	bool m_bMenuTouched{ false };
+	cocos2d::ui::Button* m_pButton{ nullptr };
+	bool m_bButtonTouched{ false };
 
 	cocos2d::EventListenerTouchOneByOne* m_pTouchListener{ nullptr };
 
