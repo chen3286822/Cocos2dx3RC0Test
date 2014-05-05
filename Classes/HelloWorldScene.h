@@ -4,6 +4,13 @@
 #include "cocos2d.h"
 #include "Card.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+extern "C"
+{
+	void showTipDialog(const char* title, const char* msg);
+}
+#endif
+
 struct MoveCard
 {
 	Card* m_pCard;							

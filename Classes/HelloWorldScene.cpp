@@ -3,6 +3,38 @@
 
 USING_NS_CC;
 
+
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "platform/android/jni/JniHelper.h"
+
+#define CLASS_NAME "org/cocos2dx/cpp/JniHelper"
+
+extern "C"
+{
+	void showTipDialog(const char* title, const char* msg)
+	{
+		JniMethodInfo t;
+		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "showTipDialog", "(Ljava/lang/String;Ljava/lang/String;)V"))
+		{
+			jstring jTitle = t.env->NewStringUTF(title);
+			jstring jMsg = t.env->NewStringUTF(msg);
+			t.env->CallStaticVoidMethod(t.classID, t.methodID, jTitle, jMsg);
+			t.env->DeleteLocalRef(jTitle);
+			t.env->DeleteLocalRef(jMsg);
+		}
+	}
+	void Java_org_cocos2dx_cpp_JniHelper_exitApp(JNIEnv *env, jobject thiz)
+	{
+		CCDirector::getInstance()->end();
+	}
+}
+
+#endif
+
+
+
+
 Scene* HelloWorld::createScene()
 {
 	// 'scene' is an autorelease object
@@ -159,10 +191,12 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 	{
 	case EventKeyboard::KeyCode::KEY_BACKSPACE:
 	{
-												  if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 												  {
-													  Director::getInstance()->end();
+													  //Director::getInstance()->end();
+													  showTipDialog("退出", "你真的要退出吗？");
 												  }
+#endif
 	}
 		break;
 	case EventKeyboard::KeyCode::KEY_ESCAPE:

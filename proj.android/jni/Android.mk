@@ -15,6 +15,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 				../../cocos2d/extensions \
 				../../cocos2d/cocos/editor-support/cocostudio \
+				../../cocos2d/cocos/2d \
 				../../cocos2d/cocos \
 				../../cocos2d
 
