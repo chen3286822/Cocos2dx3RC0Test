@@ -92,6 +92,11 @@ void Dialog::onEnter()
 // 		m_pMenu->alignItemsHorizontallyWithPadding(20);
 // 		this->addChild(m_pMenu);
 	}
+
+	this->stopAllActions();
+	this->setScale(0.3);
+	auto scaleAction = ScaleTo::create(0.3, 1);
+	this->runAction(scaleAction);
 }
 
 void Dialog::touchEvent(Ref *pSender, TouchEventType type)
