@@ -55,7 +55,7 @@ bool HelloWorld::init()
 {
 	//////////////////////////////
 	// 1. super init first
-	if (!LayerColor::initWithColor(Color4B(184,175,158,255)))
+	if (!LayerColor::initWithColor(Color4B(250,248,239,255)))
 	{
 		return false;
 	}
@@ -96,43 +96,92 @@ bool HelloWorld::init()
 // 
 // 	closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
 // 		origin.y + closeItem->getContentSize().height / 2));
+	Director::getInstance()->getTextureCache()->addImage("roundedrectangle.png");
+	Director::getInstance()->getTextureCache()->addImage("roundedrectangle2.png");
+	Director::getInstance()->getTextureCache()->addImage("roundedrectangleboard.png");
 
-	auto labelRestart = LabelTTF::create("New Game", "Arial", 25);
+	//board
+	auto spriteboard = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangleboard.png"));
+	spriteboard->setScale((m_nShorter - 4) / spriteboard->getTextureRect().size.width, (m_nShorter - 4) / spriteboard->getTextureRect().size.height);
+	spriteboard->setColor(Color3B(187, 173, 160));
+	spriteboard->setAnchorPoint(cocos2d::Point(0, 0));
+	spriteboard->setPosition(cocos2d::Point(2, m_nOffsetY - m_nBorder));
+	addChild(spriteboard, 0);
+
+	//new game
+	auto spriteNewGame = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
+	spriteNewGame->setScale(m_nCardLength * 1.2 / spriteNewGame->getTextureRect().size.width, m_nCardLength / (2.5 * spriteNewGame->getTextureRect().size.height));
+	spriteNewGame->setColor(Color3B(143, 122, 102));
+	spriteNewGame->setAnchorPoint(cocos2d::Point(1, 0));
+	spriteNewGame->setPosition(cocos2d::Point(m_nOffsetX + 4 * m_nRectLength - m_nBorder, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
+	addChild(spriteNewGame, 1);
+
+	auto labelRestart = LabelTTF::create("New Game", "Arial", 20);
 	labelRestart->setColor(Color3B(249,246,242));
 	auto restartItem = MenuItemLabel::create(labelRestart, CC_CALLBACK_1(HelloWorld::Restart, this));
-	restartItem->setAnchorPoint(Point(1, 0));
-	restartItem->setPosition(Point(m_nOffsetX + 4 * m_nRectLength - m_nBorder, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
+	restartItem->setAnchorPoint(Point(0.5, 0.5));
+	restartItem->setPosition(Point(spriteNewGame->getPosition().x - spriteNewGame->getTextureRect().size.width * spriteNewGame->getScaleX() / 2, spriteNewGame->getPosition().y + spriteNewGame->getTextureRect().size.height * spriteNewGame->getScaleY() / 2));
 
 	auto menu = Menu::create(restartItem, NULL);
 	menu->setPosition(Point::ZERO);
-	this->addChild(menu, 1);
+	this->addChild(menu, 2);
 
-	auto label = LabelTTF::create("", "Arial", m_nCardLength / 4);
+	//score
+	auto spriteScore = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
+	spriteScore->setScale(m_nCardLength / spriteScore->getTextureRect().size.width, m_nCardLength / (2 * spriteScore->getTextureRect().size.height));
+	spriteScore->setColor(Color3B(187, 173, 160));
+	spriteScore->setAnchorPoint(cocos2d::Point(0, 0));
+	spriteScore->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
+	addChild(spriteScore, 1);
+
+	auto label = LabelTTF::create("", "Arial", m_nCardLength / 6);
 	char temp[20];
-	sprintf(temp, "Score:");
+	sprintf(temp, "SCORE");
 	label->setString(temp);
-	label->setColor(Color3B::WHITE);
-	label->setAnchorPoint(cocos2d::Point(0, 0));
-	label->setPosition(cocos2d::Point(m_nOffsetX, 4 * m_nRectLength + m_nOffsetY + m_nBorder));
-	addChild(label);
+	label->setColor(Color3B(238,228,218));
+	label->setPosition(cocos2d::Point(m_nOffsetX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteScore->getTextureRect().size.height*spriteScore->getScaleY() * 3 / 4));
+	addChild(label,2);
 
 	auto labelPt = LabelTTF::create("", "Arial", m_nCardLength / 4);
 	sprintf(temp, "%d", m_nPoint);
 	labelPt->setString(temp);
 	labelPt->setColor(Color3B::WHITE);
-	labelPt->setAnchorPoint(cocos2d::Point(0, 0));
-	labelPt->setPosition(cocos2d::Point(m_nOffsetX + label->getContentSize().width , 4 * m_nRectLength + m_nOffsetY + m_nBorder));
-	addChild(labelPt,1,eChild_Point);
+	labelPt->setAnchorPoint(cocos2d::Point(0.5, 0));
+	labelPt->setPosition(cocos2d::Point(m_nOffsetX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder));
+	addChild(labelPt,2,eChild_Point);
 
-	Director::getInstance()->getTextureCache()->addImage("blank.png");
+	//best
+	auto bestScoreOffsetY = spriteScore->getTextureRect().size.height * spriteScore->getScaleY() + 5;
+	auto spriteBest = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
+	spriteBest->setScale(m_nCardLength / spriteBest->getTextureRect().size.width, m_nCardLength / (2 * spriteBest->getTextureRect().size.height));
+	spriteBest->setColor(Color3B(187, 173, 160));
+	spriteBest->setAnchorPoint(cocos2d::Point(0, 0));
+	spriteBest->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder + bestScoreOffsetY));
+	addChild(spriteBest, 1);
+
+	label = LabelTTF::create("", "Arial", m_nCardLength / 6);
+	sprintf(temp, "BEST");
+	label->setString(temp);
+	label->setColor(Color3B(238, 228, 218));
+	label->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteBest->getTextureRect().size.height*spriteBest->getScaleY() * 3 / 4 + bestScoreOffsetY));
+	addChild(label, 2);
+
+	auto labelHighPt = LabelTTF::create("", "Arial", m_nCardLength / 4);
+	sprintf(temp, "%d", m_nHighScore);
+	labelHighPt->setString(temp);
+	labelHighPt->setColor(Color3B::WHITE);
+	labelHighPt->setAnchorPoint(cocos2d::Point(0.5, 0));
+	labelHighPt->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + bestScoreOffsetY));
+	addChild(labelHighPt, 2, eChild_HighPoint);
 
 	//添加底图
 	for (int i = 0; i < 16; i++)
 	{
 		auto x = i / 4;
 		auto y = i % 4;
-		auto sprite = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("blank.png"));
-		sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
+		auto sprite = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle.png"));
+		//sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
+		sprite->setScale(m_nCardLength / sprite->getTextureRect().size.width, m_nCardLength / sprite->getTextureRect().size.height);
 		sprite->setColor(Color3B(204,192,178));
 		sprite->setAnchorPoint(cocos2d::Point(0, 0));
 		sprite->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX, x*m_nRectLength + m_nOffsetY));
@@ -194,7 +243,7 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 												  {
 													  //Director::getInstance()->end();
-													  showTipDialog("退出", "你真的要退出吗？");
+													  showTipDialog("Exit", "Do you want to end such a wonderful game?");
 												  }
 #endif
 	}

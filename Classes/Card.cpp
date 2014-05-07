@@ -42,13 +42,13 @@ void Card::setNum(int var, bool initNum)
 		case 2:
 		{
 				  m_pCardTex->setColor(Color3B(238, 228, 218));
-				  label->setColor(Color3B(124,115,106));
+				  label->setColor(Color3B(119,110,101));
 		}
 			break;
 		case 4:
 		{
 				  m_pCardTex->setColor(Color3B(236, 224, 200));
-				  label->setColor(Color3B(124, 115, 106));
+				  label->setColor(Color3B(119, 110, 101));
 		}
 			break;
 		case 8:
@@ -137,8 +137,8 @@ bool Card::init(int length)
 	}
 
 
-	m_pCardTex = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("blank.png"));
-	m_pCardTex->setTextureRect(cocos2d::Rect(0, 0, length, length));
+	m_pCardTex = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle.png"));
+	m_pCardTex->setScale(length / m_pCardTex->getTextureRect().size.width, length / m_pCardTex->getTextureRect().size.height);
 	m_pCardTex->setColor(Color3B::ORANGE);
 	m_pCardTex->setAnchorPoint(cocos2d::Point(0, 0));
 	addChild(m_pCardTex, 1, eChild_CardTex);

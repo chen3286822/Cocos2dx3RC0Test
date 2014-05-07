@@ -33,6 +33,7 @@ public:
 	enum eChild
 	{
 		eChild_Point,
+		eChild_HighPoint,
 	};
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene();
@@ -70,7 +71,7 @@ private:
 	int m_nPoint{ 0 };				//得分
 
 	//一些卡片相关的变量
-	int  m_nBorder{ 5 };		//卡片间距
+	int  m_nBorder{ 10 };		//卡片间距
 	int  m_nShorter;			//屏幕较短的一边
 	int  m_nCardLength;	//卡片边长
 	int  m_nRectLength;	//卡片+间距长
