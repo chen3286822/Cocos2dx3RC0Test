@@ -43,6 +43,21 @@ extern "C"
 	{
 		showTipDialog("test","checkbluetoothtest",EXIT_DIALOG);
 	}
+
+	//ÃÌº”¿∂—¿…Ë±∏
+	void Java_org_cocos2dx_cpp_JniHelper_addBluetoothPairedDevice(JNIEnv *env, jobject thiz,jstring name,jstring MAC)
+	{
+		auto layer = dynamic_cast<HelloWorld*>(CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
+		if (layer)
+		{
+			jboolean iscopy;
+			const char* deviceName = env->GetStringUTFChars(name,&iscopy);
+			const char* deviceMAC = env->GetStringUTFChars(MAC,&iscopy);
+			layer->AddDevice(deviceName,deviceMAC);
+			env->ReleaseStringUTFChars( name, deviceName);
+			env->ReleaseStringUTFChars( MAC, deviceMAC);
+		}
+	}
 }
 
 #endif
@@ -59,7 +74,7 @@ Scene* HelloWorld::createScene()
 	auto layer = HelloWorld::create();
 
 	// add layer as a child to scene
-	scene->addChild(layer);
+	scene->addChild(layer, 0, eChild_HelloWorldLayer);
 
 	// return the scene
 	return scene;
@@ -755,5 +770,17 @@ void HelloWorld::CheckBluetooth(Ref* pSender)
 {
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	checkBluetooth();
+#endif
+}
+
+void HelloWorld::AddDevice(std::string name, std::string MAC)
+{
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	if (MAC.compare("FINISH") == 0)
+	{
+		showTipDialog("FINISH", "Bluetooth discovery finished!", NO_BLUETOOTH_DIALOG);
+		return;
+	}
+
 #endif
 }

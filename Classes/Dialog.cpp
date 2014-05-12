@@ -94,8 +94,8 @@ void Dialog::onEnter()
 	}
 
 	this->stopAllActions();
-	this->setScale(0.3);
-	auto scaleAction = ScaleTo::create(0.3, 1);
+	this->setScale(0.3f);
+	auto scaleAction = ScaleTo::create(0.3f, 1.0f);
 	this->runAction(scaleAction);
 }
 

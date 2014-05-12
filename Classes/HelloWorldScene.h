@@ -33,6 +33,7 @@ class HelloWorld : public cocos2d::LayerColor
 public:
 	enum eChild
 	{
+		eChild_HelloWorldLayer,
 		eChild_Point,
 		eChild_HighPoint,
 	};
@@ -59,6 +60,7 @@ public:
 
 	//bluetooth
 	void CheckBluetooth(cocos2d::Ref* pSender);
+	void AddDevice(std::string name,std::string MAC);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
