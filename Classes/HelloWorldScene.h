@@ -4,14 +4,6 @@
 #include "cocos2d.h"
 #include "Card.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-extern "C"
-{
-	void showTipDialog(const char* title, const char* msg,int msgID);
-	void checkBluetooth();
-}
-#endif
-
 struct MoveCard
 {
 	Card* m_pCard;							
@@ -57,10 +49,6 @@ public:
 	void AddNewCard();
 	Card* FindCard(int x,int y);
 	void Restart(cocos2d::Ref* pSender);
-
-	//bluetooth
-	void CheckBluetooth(cocos2d::Ref* pSender);
-	void AddDevice(std::string name,std::string MAC);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);

@@ -80,6 +80,11 @@ public class Cocos2dxActivity extends NativeActivity{
 				break;
 			case CONNECT_BLUETOOTH:
 			{
+				if(mSearching)
+				{
+					JniHelper.showTipDialog("Error","Bluetooth is searching now!",Cocos2dxActivity.NO_BLUETOOTH_DIALOG);
+					return;
+				}
 				//check bluetooth
 				mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 				//test
@@ -96,6 +101,8 @@ public class Cocos2dxActivity extends NativeActivity{
 					msgEnableBT.sendToTarget();
 					return;
 				}
+				//cancel searching first
+				//mBluetoothAdapter.cancelDiscovery();
 				//get devices already paired first
 				Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 				// If there are paired devices
@@ -104,6 +111,10 @@ public class Cocos2dxActivity extends NativeActivity{
 				    for (BluetoothDevice device : pairedDevices) {
 				    	JniHelper.addBluetoothPairedDevice(device.getName(),device.getAddress());
 				    }
+				}
+				else
+				{
+					JniHelper.addBluetoothPairedDevice("no bonded devices","aaabbbcc");
 				}
 				mBluetoothAdapter.startDiscovery();
 			}
@@ -120,6 +131,7 @@ public class Cocos2dxActivity extends NativeActivity{
 		// Register for broadcasts when a device is discovered and discovery has finished
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(BluetoothDevice.ACTION_FOUND);
+		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		this.registerReceiver(mReceiver, filter);
 		//For supports translucency
@@ -179,6 +191,7 @@ public class Cocos2dxActivity extends NativeActivity{
 	public static final int REQUEST_ENABLE_BLUETOOTH = 0x01;
 	
 	//bluetooth
+	private boolean mSearching = false;
 	private BluetoothAdapter mBluetoothAdapter;
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 	    public void onReceive(Context context, Intent intent) {
@@ -195,8 +208,13 @@ public class Cocos2dxActivity extends NativeActivity{
 	        else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) 
             {
 	        	//indicate discovery finished
-	        	JniHelper.addBluetoothPairedDevice("","FINISH");
+	        	mSearching = false;
+	        	JniHelper.addBluetoothPairedDevice("","FINISH");	        	
             }
+	        else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
+	        {
+	        	mSearching = true;
+	        }
 	    }
 	};
 }

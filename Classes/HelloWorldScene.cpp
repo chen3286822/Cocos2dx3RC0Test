@@ -1,69 +1,8 @@
 #include "HelloWorldScene.h"
 #include "Dialog.h"
+#include "JNIFunc.h"
 
 USING_NS_CC;
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-#include "platform/android/jni/JniHelper.h"
-
-#define CLASS_NAME "org/cocos2dx/cpp/JniHelper"
-#define EXIT_DIALOG 0x01
-#define NO_BLUETOOTH_DIALOG 0x02
-
-extern "C"
-{
-	void showTipDialog(const char* title, const char* msg,int msgID)
-	{
-		JniMethodInfo t;
-		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "showTipDialog", "(Ljava/lang/String;Ljava/lang/String;I)V"))
-		{
-			jstring jTitle = t.env->NewStringUTF(title);
-			jstring jMsg = t.env->NewStringUTF(msg);
-			jint jMsgID = msgID;
-			t.env->CallStaticVoidMethod(t.classID, t.methodID, jTitle, jMsg,jMsgID);
-			t.env->DeleteLocalRef(jTitle);
-			t.env->DeleteLocalRef(jMsg);
-		}
-	}
-	void Java_org_cocos2dx_cpp_JniHelper_exitApp(JNIEnv *env, jobject thiz)
-	{
-		CCDirector::getInstance()->end();
-	}
-
-	//检查蓝牙
-	void checkBluetooth()
-	{
-		JniMethodInfo t;
-		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "connectBluetooth", "()V"))
-		{
-			t.env->CallStaticVoidMethod(t.classID, t.methodID);
-		}
-	}
-	void Java_org_cocos2dx_cpp_JniHelper_stopBluetoothCheck(JNIEnv *env, jobject thiz)
-	{
-		showTipDialog("test","checkbluetoothtest",EXIT_DIALOG);
-	}
-
-	//添加蓝牙设备
-	void Java_org_cocos2dx_cpp_JniHelper_addBluetoothPairedDevice(JNIEnv *env, jobject thiz,jstring name,jstring MAC)
-	{
-		auto layer = dynamic_cast<HelloWorld*>(CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
-		if (layer)
-		{
-			jboolean iscopy;
-			const char* deviceName = env->GetStringUTFChars(name,&iscopy);
-			const char* deviceMAC = env->GetStringUTFChars(MAC,&iscopy);
-			layer->AddDevice(deviceName,deviceMAC);
-			env->ReleaseStringUTFChars( name, deviceName);
-			env->ReleaseStringUTFChars( MAC, deviceMAC);
-		}
-	}
-}
-
-#endif
-
-
-
 
 Scene* HelloWorld::createScene()
 {
@@ -137,17 +76,6 @@ bool HelloWorld::init()
 	spriteboard->setAnchorPoint(cocos2d::Point(0, 0));
 	spriteboard->setPosition(cocos2d::Point(2, m_nOffsetY - m_nBorder));
 	addChild(spriteboard, 0);
-
-	//bluetooth check
-	auto labelBluetooth = LabelTTF::create("Check Bluetooth", "Arial", 20);
-	labelBluetooth->setColor(Color3B(249, 246, 242));
-	auto bluetoothItem = MenuItemLabel::create(labelBluetooth, CC_CALLBACK_1(HelloWorld::CheckBluetooth, this));
-	bluetoothItem->setAnchorPoint(Point(0.5, 0.5));
-	bluetoothItem->setPosition(Point(50, visibleSize.height - 20));
-
-	auto menuBluetooth = Menu::create(bluetoothItem, NULL);
-	menuBluetooth->setPosition(Point::ZERO);
-	this->addChild(menuBluetooth, 2);
 
 	//new game
 	auto spriteNewGame = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
@@ -766,21 +694,4 @@ void HelloWorld::CheckFailure()
 	addChild(dialog,3);
 }
 
-void HelloWorld::CheckBluetooth(Ref* pSender)
-{
-#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	checkBluetooth();
-#endif
-}
 
-void HelloWorld::AddDevice(std::string name, std::string MAC)
-{
-#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	if (MAC.compare("FINISH") == 0)
-	{
-		showTipDialog("FINISH", "Bluetooth discovery finished!", NO_BLUETOOTH_DIALOG);
-		return;
-	}
-
-#endif
-}

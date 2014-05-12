@@ -10,7 +10,10 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../Classes/HelloWorldScene.cpp \
 				   ../../Classes/Card.cpp \
-				   ../../Classes/Dialog.cpp
+				   ../../Classes/Dialog.cpp \
+				   ../../Classes/MainTitleScene.cpp \
+				   ../../Classes/BluetoothScene.cpp \
+				   ../../Classes/JNIFunc.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 				../../cocos2d/extensions \
