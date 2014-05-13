@@ -169,7 +169,13 @@ public class Cocos2dxActivity extends NativeActivity{
 	
 	private void connectDevice(Intent data, boolean secure)
 	{
-		
+        // Get the device MAC address
+        String address = data.getExtras()
+            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        // Get the BluetoothDevice object
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        // Attempt to connect to the device
+        //mChatService.connect(device, secure);
 	}
 	
 	@Override
@@ -229,30 +235,5 @@ public class Cocos2dxActivity extends NativeActivity{
 	//bluetooth
 	private boolean mSearching = false;
 	private BluetoothAdapter mBluetoothAdapter = null;
-//	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-//	    public void onReceive(Context context, Intent intent) {
-//	        String action = intent.getAction();
-//	        // When discovery finds a device
-//	        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-//	            // Get the BluetoothDevice object from the Intent
-//	            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//	            // If it's already paired, skip it, because it's been listed already
-//                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-//                	JniHelper.addBluetoothPairedDevice(device.getName(),device.getAddress());
-//                }
-//	        }
-//	        else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) 
-//            {
-//	        	//indicate discovery finished
-//	        	mSearching = false;
-//	        	ToastMsg("Searching finished!",Toast.LENGTH_SHORT);
-//	        	//JniHelper.addBluetoothPairedDevice("","FINISH");	        	
-//            }
-//	        else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
-//	        {
-//	        	mSearching = true;
-//	        	ToastMsg("Searching start!",Toast.LENGTH_SHORT);
-//	        }
-//	    }
-//	};
+
 }
