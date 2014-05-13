@@ -13,7 +13,8 @@
 extern "C"
 {
 	void showTipDialog(const char* title, const char* msg, int msgID);
-	void checkBluetooth();
+	void searchBluetooth();
+	void initBluetooth();
 }
 #endif
 

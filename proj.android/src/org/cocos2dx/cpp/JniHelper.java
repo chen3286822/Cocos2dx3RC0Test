@@ -32,6 +32,14 @@ public class JniHelper {
 		 msg.what = Cocos2dxActivity.CONNECT_BLUETOOTH;
 		 msg.sendToTarget();
 	}
+	
+	public static void initBluetooth()
+	{
+		Message msg = mHandler.obtainMessage();
+		 msg.what = Cocos2dxActivity.INIT_BLUETOOTH;
+		 msg.sendToTarget();
+	}
+	
 	public static native void stopBluetoothCheck();
 	public static native void addBluetoothPairedDevice(final String name,final String MAC);
 }

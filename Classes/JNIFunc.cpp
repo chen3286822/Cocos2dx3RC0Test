@@ -27,8 +27,8 @@ extern "C"
 		CCDirector::getInstance()->end();
 	}
 
-	//¼ì²éÀ¶ÑÀ
-	void checkBluetooth()
+	//ËÑË÷À¶ÑÀÉè±¸
+	void searchBluetooth()
 	{
 		JniMethodInfo t;
 		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "connectBluetooth", "()V"))
@@ -36,6 +36,16 @@ extern "C"
 			t.env->CallStaticVoidMethod(t.classID, t.methodID);
 		}
 	}
+
+	void initBluetooth()
+	{
+		JniMethodInfo t;
+		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "initBluetooth", "()V"))
+		{
+			t.env->CallStaticVoidMethod(t.classID, t.methodID);
+		}
+	}
+
 	void Java_org_cocos2dx_cpp_JniHelper_stopBluetoothCheck(JNIEnv *env, jobject thiz)
 	{
 		//showTipDialog("test", "checkbluetoothtest", EXIT_DIALOG);

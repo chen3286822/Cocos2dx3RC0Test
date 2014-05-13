@@ -43,18 +43,18 @@ bool Bluetooth::init()
 	tableView->reloadData();
 
 	//bluetooth check
-// 	auto labelBluetooth = LabelTTF::create("Check Bluetooth", "Arial", 25);
-// 	labelBluetooth->setColor(Color3B(249, 246, 242));
-// 	auto bluetoothItem = MenuItemLabel::create(labelBluetooth, CC_CALLBACK_1(Bluetooth::CheckBluetooth, this));
-// 	bluetoothItem->setAnchorPoint(Point(0.5, 0));
-// 	bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
-// 	 
-// 	auto menuBluetooth = Menu::create(bluetoothItem, NULL);
-// 	menuBluetooth->setPosition(Point::ZERO);
-// 	this->addChild(menuBluetooth, 1, eChild_CheckBluetoothItem);
+	auto labelBluetooth = LabelTTF::create("Check Bluetooth", "Arial", 25);
+	labelBluetooth->setColor(Color3B(249, 246, 242));
+	auto bluetoothItem = MenuItemLabel::create(labelBluetooth, CC_CALLBACK_1(Bluetooth::CheckBluetooth, this));
+	bluetoothItem->setAnchorPoint(Point(0.5, 0));
+	bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
+	 
+	auto menuBluetooth = Menu::create(bluetoothItem, NULL);
+	menuBluetooth->setPosition(Point::ZERO);
+	this->addChild(menuBluetooth, 1, eChild_CheckBluetoothItem);
 
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	checkBluetooth();
+	initBluetooth();
 #endif
 	return true;
 }
@@ -112,7 +112,7 @@ void Bluetooth::CheckBluetooth(Ref* pSender)
 {
 	m_vDevices.clear();
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	checkBluetooth();
+	searchBluetooth();
 #elif(CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 	auto dialog = Dialog::create();
 	dialog->SetTitle("Error");
