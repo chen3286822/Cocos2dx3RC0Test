@@ -1,22 +1,20 @@
 package org.cocos2dx.cpp;
 
-import java.util.Set;
 
 import org.cocos2dx.cpp.DeviceListActivity;
-
+import org.cocos2dx.cpp.BluetoothConnectionService;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NativeActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 // The name of .so is specified in AndroidMenifest.xml. NativityActivity will load it automatically for you.
@@ -99,7 +97,12 @@ public class Cocos2dxActivity extends NativeActivity{
 					JniHelper.showTipDialog("Error","No bluetooth available!",Cocos2dxActivity.NO_BLUETOOTH_DIALOG);
 					return;
 				}
-				if (!mBluetoothAdapter.isEnabled()) {
+			}
+				break;
+			case CONNECT_BLUETOOTH:
+			{
+				if (!mBluetoothAdapter.isEnabled())
+				{
 					ToastMsg("Bluetooth is disabled now!",Toast.LENGTH_SHORT);
 					
 					Message msgEnableBT = handler.obtainMessage();
@@ -107,37 +110,76 @@ public class Cocos2dxActivity extends NativeActivity{
 					msgEnableBT.sendToTarget();
 					return;
 				}
-				//cancel searching first
-				//mBluetoothAdapter.cancelDiscovery();
-				//get devices already paired first
-//				Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-//				// If there are paired devices
-//				if (pairedDevices.size() > 0) {
-//				    // Loop through paired devices
-//				    for (BluetoothDevice device : pairedDevices) {
-//				    	JniHelper.addBluetoothPairedDevice(device.getName(),device.getAddress());
-//				    }
-//				}
-//				else
-//				{
-//					ToastMsg("No bonded devices!",Toast.LENGTH_SHORT);
-//				}
-//				mBluetoothAdapter.startDiscovery();
-			}
-				break;
-			case CONNECT_BLUETOOTH:
-			{
+				
+				if (mConnecttService == null)
+				{
+					mConnecttService = new BluetoothConnectionService(Cocos2dxActivity.this, handler);
+		            // Only if the state is STATE_NONE, do we know that we haven't started already
+		            if (mConnecttService.getState() == BluetoothConnectionService.STATE_NONE) {
+		              // Start the Bluetooth chat services
+		            	mConnecttService.start();
+		            }
+				}
+				
 				// Launch the DeviceListActivity to see devices and do scan
 				Intent serverIntent = new Intent(Cocos2dxActivity.this,DeviceListActivity.class);				
 	            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
 			}
 				break;
+			case STOP_BLUETOOTH:
+			{
+				if (mConnecttService != null) 
+				{
+					mConnecttService.stop();
+					mConnecttService = null;
+				}
+				
+			}
+				break;
+			case MESSAGE_STATE_CHANGE:
+                if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                switch (msg.arg1) {
+                case BluetoothConnectionService.STATE_CONNECTED:
+                    //setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
+                    //mConversationArrayAdapter.clear();
+                    break;
+                case BluetoothConnectionService.STATE_CONNECTING:
+                    //setStatus(R.string.title_connecting);
+                    break;
+                case BluetoothConnectionService.STATE_LISTEN:
+                case BluetoothConnectionService.STATE_NONE:
+                    //setStatus(R.string.title_not_connected);
+                    break;
+                }
+                break;
+            case MESSAGE_WRITE:
+                byte[] writeBuf = (byte[]) msg.obj;
+                // construct a string from the buffer
+                String writeMessage = new String(writeBuf);
+                //mConversationArrayAdapter.add("Me:  " + writeMessage);
+                break;
+            case MESSAGE_READ:
+                byte[] readBuf = (byte[]) msg.obj;
+                // construct a string from the valid bytes in the buffer
+                String readMessage = new String(readBuf, 0, msg.arg1);
+                //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+                break;
+            case MESSAGE_DEVICE_NAME:
+                // save the connected device's name
+                mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+                Toast.makeText(getApplicationContext(), "Connected to "
+                               + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                break;
+            case MESSAGE_TOAST:
+                Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+                               Toast.LENGTH_SHORT).show();
+                break;
 			}
 		}
 	};
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+		
 		super.onCreate(savedInstanceState);
 		JniHelper.init(handler);
 		
@@ -175,7 +217,7 @@ public class Cocos2dxActivity extends NativeActivity{
         // Get the BluetoothDevice object
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
-        //mChatService.connect(device, secure);
+        mConnecttService.connect(device, secure);
 	}
 	
 	@Override
@@ -227,13 +269,33 @@ public class Cocos2dxActivity extends NativeActivity{
 	public static final int ASK_ENABLE_BLUETOOTH = 0x003;
 	public static final int INIT_BLUETOOTH = 0x004;
 	public static final int CONNECT_BLUETOOTH = 0x005;
-	
+    // Message types sent from the BluetoothConnectionService Handler
+    public static final int MESSAGE_STATE_CHANGE = 0x006;
+    public static final int MESSAGE_READ = 0x007;
+    public static final int MESSAGE_WRITE = 0x008;
+    public static final int MESSAGE_DEVICE_NAME = 0x009;
+    public static final int MESSAGE_TOAST = 0x0010;
+	//more msg
+    public static final int STOP_BLUETOOTH = 0x0011;
+    
 	//msg for bluetooth state
 	public static final int REQUEST_ENABLE_BLUETOOTH = 0x01;
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 0x02;
+	   
+    // Key names received from the BluetoothConnectionService Handler
+    public static final String DEVICE_NAME = "device_name";
+    public static final String TOAST = "toast";
 	
 	//bluetooth
 	private boolean mSearching = false;
 	private BluetoothAdapter mBluetoothAdapter = null;
-
+	// Member object for the connection services
+    private BluetoothConnectionService mConnecttService = null;
+    
+    // Name of the connected device
+    private String mConnectedDeviceName = null;
+    
+    // Debugging
+    private static final String TAG = "2048";
+    private static final boolean D = true;
 }
