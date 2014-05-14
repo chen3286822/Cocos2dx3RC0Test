@@ -3,6 +3,7 @@ package org.cocos2dx.cpp;
 
 import org.cocos2dx.cpp.DeviceListActivity;
 import org.cocos2dx.cpp.BluetoothConnectionService;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NativeActivity;
@@ -138,10 +139,12 @@ public class Cocos2dxActivity extends NativeActivity{
 				break;
 			case MESSAGE_STATE_CHANGE:
                 if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                
+                //inform the connection state
+                JniHelper.informConnectionState(BluetoothConnectionService.STATE_CONNECTED);
+                
                 switch (msg.arg1) {
-                case BluetoothConnectionService.STATE_CONNECTED:
-                    //setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-                    //mConversationArrayAdapter.clear();
+                case BluetoothConnectionService.STATE_CONNECTED:           	
                     break;
                 case BluetoothConnectionService.STATE_CONNECTING:
                     //setStatus(R.string.title_connecting);
@@ -162,7 +165,7 @@ public class Cocos2dxActivity extends NativeActivity{
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
-                //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+                JniHelper.getMessage(readMessage);
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
@@ -174,6 +177,10 @@ public class Cocos2dxActivity extends NativeActivity{
                 Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
                                Toast.LENGTH_SHORT).show();
                 break;
+            case SEND_MESSAGE:
+            	byte[] sendBuf = (byte[]) msg.obj;
+            	sendMsg(sendBuf);
+            	break;
 			}
 		}
 	};
@@ -218,6 +225,33 @@ public class Cocos2dxActivity extends NativeActivity{
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
         mConnecttService.connect(device, secure);
+	}
+	
+	private void sendMsg(String message)
+	{
+        // Check that we're actually connected before trying anything
+        if (mConnecttService.getState() != BluetoothConnectionService.STATE_CONNECTED) {
+            Toast.makeText(this, "Not connect yet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check that there's actually something to send
+        if (message.length() > 0) {
+            // Get the message bytes and tell the BluetoothChatService to write
+            byte[] send = message.getBytes();
+            mConnecttService.write(send);
+        }
+	}
+	
+	private void sendMsg(byte[] message)
+	{
+        // Check that we're actually connected before trying anything
+        if (mConnecttService.getState() != BluetoothConnectionService.STATE_CONNECTED) {
+            Toast.makeText(this, "Not connect yet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        mConnecttService.write(message);
 	}
 	
 	@Override
@@ -277,6 +311,7 @@ public class Cocos2dxActivity extends NativeActivity{
     public static final int MESSAGE_TOAST = 0x0010;
 	//more msg
     public static final int STOP_BLUETOOTH = 0x0011;
+    public static final int SEND_MESSAGE = 0x0012;
     
 	//msg for bluetooth state
 	public static final int REQUEST_ENABLE_BLUETOOTH = 0x01;

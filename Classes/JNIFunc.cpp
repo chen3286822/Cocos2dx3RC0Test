@@ -22,10 +22,6 @@ extern "C"
 			t.env->DeleteLocalRef(jMsg);
 		}
 	}
-	void Java_org_cocos2dx_cpp_JniHelper_exitApp(JNIEnv *env, jobject thiz)
-	{
-		CCDirector::getInstance()->end();
-	}
 
 	//搜索蓝牙设备
 	void searchBluetooth()
@@ -37,6 +33,7 @@ extern "C"
 		}
 	}
 
+	//初始化蓝牙
 	void initBluetooth()
 	{
 		JniMethodInfo t;
@@ -44,6 +41,34 @@ extern "C"
 		{
 			t.env->CallStaticVoidMethod(t.classID, t.methodID);
 		}
+	}
+
+	//停止蓝牙连接
+	void stopBluetooth()
+	{
+		JniMethodInfo t;
+		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "stopBluetooth", "()V"))
+		{
+			t.env->CallStaticVoidMethod(t.classID, t.methodID);
+		}
+	}
+
+	//向连接设备发送数据
+	void sendMessage(const char* data)
+	{
+		JniMethodInfo t;
+		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "sendMessage", "(Ljava/lang/String;)V"))
+		{
+			jstring jData = t.env->NewStringUTF(data);
+			t.env->CallStaticVoidMethod(t.classID, t.methodID,jData);
+			t.env->DeleteLocalRef(jData);
+		}
+	}
+
+
+	void Java_org_cocos2dx_cpp_JniHelper_exitApp(JNIEnv *env, jobject thiz)
+	{
+		CCDirector::getInstance()->end();
 	}
 
 	void Java_org_cocos2dx_cpp_JniHelper_stopBluetoothCheck(JNIEnv *env, jobject thiz)
@@ -68,6 +93,22 @@ extern "C"
 		{
 			showTipDialog("error", "not found layer", NO_BLUETOOTH_DIALOG);
 		}
+	}
+
+	//接受蓝牙数据
+	void Java_org_cocos2dx_cpp_JniHelper_getMessage(JNIEnv *env, jobject thiz, jstring jdata)
+	{
+		jboolean iscopy;
+		const char* data = env->GetStringUTFChars(jdata, &iscopy);
+		//处理数据
+		env->ReleaseStringUTFChars(jdata, data);
+	}
+
+	//接受连接状态
+	void Java_org_cocos2dx_cpp_JniHelper_informConnectionState(JNIEnv *env, jobject thiz, jint jstate)
+	{
+		int state = jstate;
+		//根据状态处理
 	}
 }
 
