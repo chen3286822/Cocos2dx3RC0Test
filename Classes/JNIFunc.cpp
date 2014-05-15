@@ -101,6 +101,11 @@ extern "C"
 		jboolean iscopy;
 		const char* data = env->GetStringUTFChars(jdata, &iscopy);
 		//处理数据
+		auto layer = dynamic_cast<Bluetooth*>(CCDirector::getInstance()->getRunningScene()->getChildByTag(Bluetooth::eChild_BluetoothLayer));
+		if(layer)
+		{
+			layer->GetMessage(data);
+		}
 		env->ReleaseStringUTFChars(jdata, data);
 	}
 
@@ -109,6 +114,11 @@ extern "C"
 	{
 		int state = jstate;
 		//根据状态处理
+		auto layer = dynamic_cast<Bluetooth*>(CCDirector::getInstance()->getRunningScene()->getChildByTag(Bluetooth::eChild_BluetoothLayer));
+		if(layer)
+		{
+			layer->CheckConnectionState(state);
+		}
 	}
 }
 

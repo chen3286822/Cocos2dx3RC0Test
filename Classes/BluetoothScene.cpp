@@ -29,83 +29,44 @@ bool Bluetooth::init()
 		return false;
 	}
 
+	auto listener = EventListenerKeyboard::create();
+	listener->onKeyReleased = CC_CALLBACK_2(Bluetooth::onKeyReleased, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
 	m_vDevices.clear();
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 
-	TableView* tableView = TableView::create(this, Size(visibleSize.width, visibleSize.height*7/8));
-	tableView->setDirection(ScrollView::Direction::VERTICAL);
-	tableView->setPosition(Point(origin.x, origin.y + visibleSize.height/8));
-	tableView->setDelegate(this);
-	tableView->setVerticalFillOrder(TableView::VerticalFillOrder::TOP_DOWN);
-	this->addChild(tableView, 1, eChild_DeviceListView);
-	tableView->reloadData();
 
 	//bluetooth check
 	auto labelBluetooth = LabelTTF::create("Check Bluetooth", "Arial", 25);
 	labelBluetooth->setColor(Color3B(249, 246, 242));
 	auto bluetoothItem = MenuItemLabel::create(labelBluetooth, CC_CALLBACK_1(Bluetooth::CheckBluetooth, this));
 	bluetoothItem->setAnchorPoint(Point(0.5, 0));
-	bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
+	//bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
+
+	//test send msg
+	auto labelSend = LabelTTF::create("Send Message", "Arial", 25);
+	labelSend->setColor(Color3B(249, 246, 242));
+	auto sendItem = MenuItemLabel::create(labelSend, CC_CALLBACK_1(Bluetooth::SendMessage, this));
+	sendItem->setAnchorPoint(Point(0.5, 0));
+	//sendItem->setPosition(Point(origin.x + visibleSize.width / 2, origin.y));
 	 
-	auto menuBluetooth = Menu::create(bluetoothItem, NULL);
-	menuBluetooth->setPosition(Point::ZERO);
+	auto menuBluetooth = Menu::create(bluetoothItem,sendItem, NULL);
+	menuBluetooth->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
+	menuBluetooth->alignItemsHorizontallyWithPadding(20);
 	this->addChild(menuBluetooth, 1, eChild_CheckBluetoothItem);
+
+	auto showLabel = LabelTTF::create("Nothing", "Arial", 25);
+	showLabel->setAnchorPoint(Point(0, 1));
+	showLabel->setPosition(Point(origin.x + 20,origin.y + visibleSize.height - 40));
+	this->addChild(showLabel, 1, eChild_ShowLabel);
 
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	initBluetooth();
 #endif
 	return true;
-}
-
-
-void Bluetooth::tableCellTouched(TableView* table, TableViewCell* cell)
-{
-	CCLOG("cell touched at index: %ld", cell->getIdx());
-}
-
-Size Bluetooth::tableCellSizeForIndex(TableView *table, ssize_t idx)
-{
-	return Size(Director::getInstance()->getVisibleSize().width, Director::getInstance()->getVisibleSize().height/8);
-}
-
-TableViewCell* Bluetooth::tableCellAtIndex(TableView *table, ssize_t idx)
-{
- 	if (idx >= m_vDevices.size())
- 	{
- 		return nullptr;
- 	}
-	
-	auto string = String::createWithFormat("%s : %s", m_vDevices[idx].strName.c_str(),m_vDevices[idx].strMAC.c_str());
-	TableViewCell *cell = table->dequeueCell();
-	if (!cell) {
-		cell = new TableViewCell();
-		cell->autorelease();
-		auto sprite = Sprite::create("CloseSelected.png");
-		sprite->setAnchorPoint(Point::ZERO);
-		sprite->setPosition(Point(0, 0));
-		cell->addChild(sprite);
-
-		auto label = LabelTTF::create(string->getCString(), "Helvetica", 20.0);
-		label->setPosition(Point::ZERO);
-		label->setAnchorPoint(Point::ZERO);
-		label->setTag(123);
-		cell->addChild(label);
-	}
-	else
-	{
-		auto label = (LabelTTF*)cell->getChildByTag(123);
-		label->setString(string->getCString());
-	}
-
-
-	return cell;
-}
-
-ssize_t Bluetooth::numberOfCellsInTableView(TableView *table)
-{
-	return m_vDevices.size();
 }
 
 void Bluetooth::CheckBluetooth(Ref* pSender)
@@ -122,6 +83,26 @@ void Bluetooth::CheckBluetooth(Ref* pSender)
 #endif
 }
 
+void Bluetooth::SendMessage(cocos2d::Ref* pSender)
+{
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	sendMessage("Hello!");
+#endif
+}
+
+void Bluetooth::GetMessage(const char* data)
+{
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+	if (label)
+	{
+		std::string strMsg = label->getString();
+		strMsg += "\n";
+		strMsg += data;
+		label->setString(strMsg);
+	}
+#endif
+}
 
 void Bluetooth::AddDevice(std::string name, std::string MAC)
 {
@@ -137,16 +118,83 @@ void Bluetooth::AddDevice(std::string name, std::string MAC)
 	device.strMAC = MAC;
 	m_vDevices.push_back(device);
 
-	auto tableView = dynamic_cast<TableView*>(this->getChildByTag(eChild_DeviceListView));
-	if (tableView)
-	{
-		tableView->reloadData();
-	}
 	
+#endif
+}
+
+void Bluetooth::CheckConnectionState(int state)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	switch (state)
+	{
+	case STATE_CONNECTED:
+	{
+							auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+							if (label)
+							{
+								label->setString("Connected");
+							}
+	}
+		break;
+	case STATE_CONNECTING:
+	{
+							auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+							if (label)
+							{
+								label->setString("Connecting");
+							}
+	}
+		break;
+	case STATE_NONE:
+	{
+							auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+							if (label)
+							{
+								label->setString("Not connected");
+							}
+	}
+		break;
+	case STATE_LISTEN:
+	{
+					   auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+					   if (label)
+					   {
+						   label->setString("Listening");
+					   }
+	}
+		break;
+	default:
+		break;
+	}
 #endif
 }
 
 void Bluetooth::BackToMainTitle(cocos2d::Ref* pSender)
 {
 	Director::getInstance()->replaceScene(MainTitle::createScene());
+}
+
+//½ÓÊÜ·µ»Ø¼ü
+void Bluetooth::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
+{
+	switch (keycode)
+	{
+	case EventKeyboard::KeyCode::KEY_BACKSPACE:
+	{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		{
+			//Director::getInstance()->end();
+			showTipDialog("Exit", "Do you want to end such a wonderful game?", EXIT_DIALOG);
+		}
+#endif
+	}
+		break;
+	case EventKeyboard::KeyCode::KEY_ESCAPE:
+	{
+											   Director::getInstance()->end();
+	}
+		break;
+	default:
+		break;
+	}
 }

@@ -141,7 +141,7 @@ public class Cocos2dxActivity extends NativeActivity{
                 if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                 
                 //inform the connection state
-                JniHelper.informConnectionState(BluetoothConnectionService.STATE_CONNECTED);
+                JniHelper.informConnectionState(msg.arg1);
                 
                 switch (msg.arg1) {
                 case BluetoothConnectionService.STATE_CONNECTED:           	
@@ -178,8 +178,8 @@ public class Cocos2dxActivity extends NativeActivity{
                                Toast.LENGTH_SHORT).show();
                 break;
             case SEND_MESSAGE:
-            	byte[] sendBuf = (byte[]) msg.obj;
-            	sendMsg(sendBuf);
+            	//byte[] sendBuf = (byte[]) msg.obj;
+            	sendMsg((String)msg.obj);
             	break;
 			}
 		}

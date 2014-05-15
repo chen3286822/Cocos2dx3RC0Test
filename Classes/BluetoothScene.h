@@ -11,14 +11,14 @@ struct DeviceMAC
 };
 typedef std::vector<DeviceMAC> VDeviceMAC;
 
-class Bluetooth : public cocos2d::LayerColor, public cocos2d::extension::TableViewDataSource, public cocos2d::extension::TableViewDelegate
+class Bluetooth : public cocos2d::LayerColor
 {
 public:
 	enum eChild
 	{
 		eChild_BluetoothLayer,
-		eChild_DeviceListView,
 		eChild_CheckBluetoothItem,
+		eChild_ShowLabel,
 	};
 
 	static cocos2d::Scene* createScene();
@@ -26,19 +26,19 @@ public:
 	virtual bool init();
 	void BackToMainTitle(cocos2d::Ref* pSender);
 
+	//½ÓÊÜ·µ»Ø¼ü
+	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
+
 	//bluetooth
 	void CheckBluetooth(cocos2d::Ref* pSender);
 	void AddDevice(std::string name, std::string MAC);
+	void CheckConnectionState(int state);
+	//test
+	void SendMessage(cocos2d::Ref* pSender);
+	void GetMessage(const char* data);
 
 	// implement the "static create()" method manually
 	CREATE_FUNC(Bluetooth);
-
-	virtual void scrollViewDidScroll(cocos2d::extension::ScrollView* view) {};
-	virtual void scrollViewDidZoom(cocos2d::extension::ScrollView* view) {}
-	virtual void tableCellTouched(cocos2d::extension::TableView* table, cocos2d::extension::TableViewCell* cell);
-	virtual cocos2d::Size tableCellSizeForIndex(cocos2d::extension::TableView *table, ssize_t idx);
-	virtual cocos2d::extension::TableViewCell* tableCellAtIndex(cocos2d::extension::TableView *table, ssize_t idx);
-	virtual ssize_t numberOfCellsInTableView(cocos2d::extension::TableView *table);
 
 private:
 	VDeviceMAC m_vDevices;
