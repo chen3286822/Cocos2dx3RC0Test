@@ -2,6 +2,7 @@
 #include "Dialog.h"
 #include "MainTitleScene.h"
 #include "JNIFunc.h"
+#include "Unity.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -40,27 +41,28 @@ bool Bluetooth::init()
 
 
 	//bluetooth check
-	auto labelBluetooth = LabelTTF::create("Check Bluetooth", "Arial", 25);
+	auto labelBluetooth = LabelTTF::create("Check Bluetooth", unity::GetDefaultFontType(), 25);
 	labelBluetooth->setColor(Color3B(249, 246, 242));
 	auto bluetoothItem = MenuItemLabel::create(labelBluetooth, CC_CALLBACK_1(Bluetooth::CheckBluetooth, this));
 	bluetoothItem->setAnchorPoint(Point(0.5, 0));
-	//bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
+	bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
 
-	//test send msg
-	auto labelSend = LabelTTF::create("Send Message", "Arial", 25);
-	labelSend->setColor(Color3B(249, 246, 242));
-	auto sendItem = MenuItemLabel::create(labelSend, CC_CALLBACK_1(Bluetooth::SendMessage, this));
-	sendItem->setAnchorPoint(Point(0.5, 0));
-	//sendItem->setPosition(Point(origin.x + visibleSize.width / 2, origin.y));
+	//begin game menu item
+ 	auto labelStart = LabelTTF::create("Start Game", unity::GetDefaultFontType(), 25);
+	labelStart->setColor(Color3B(249, 246, 242));
+	auto startItem = MenuItemLabel::create(labelStart, CC_CALLBACK_1(Bluetooth::StartGame, this));
+	startItem->setPosition(Point(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+	startItem->setVisible(false);
 	 
-	auto menuBluetooth = Menu::create(bluetoothItem,sendItem, NULL);
-	menuBluetooth->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
-	menuBluetooth->alignItemsHorizontallyWithPadding(20);
-	this->addChild(menuBluetooth, 1, eChild_CheckBluetoothItem);
+	auto menuBluetooth = Menu::create();
+	menuBluetooth->addChild(bluetoothItem, 1, eChild_CheckBluetoothItem);
+	menuBluetooth->addChild(startItem, 1, eChild_StartGameItem);
+	menuBluetooth->setPosition(Point::ZERO);
+	this->addChild(menuBluetooth, 1, eChild_Menu);
 
-	auto showLabel = LabelTTF::create("Nothing", "Arial", 25);
-	showLabel->setAnchorPoint(Point(0, 1));
-	showLabel->setPosition(Point(origin.x + 20,origin.y + visibleSize.height - 40));
+	auto showLabel = LabelTTF::create("Nothing", unity::GetDefaultFontType(), 25);
+	showLabel->setAnchorPoint(Point(0.5, 1));
+	showLabel->setPosition(Point(origin.x + visibleSize.width/2,origin.y + visibleSize.height - 40));
 	this->addChild(showLabel, 1, eChild_ShowLabel);
 
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -83,7 +85,7 @@ void Bluetooth::CheckBluetooth(Ref* pSender)
 #endif
 }
 
-void Bluetooth::SendMessage(cocos2d::Ref* pSender)
+void Bluetooth::StartGame(cocos2d::Ref* pSender)
 {
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	sendMessage("Hello!");
@@ -96,10 +98,7 @@ void Bluetooth::GetMessage(const char* data)
 	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
 	if (label)
 	{
-		std::string strMsg = label->getString();
-		strMsg += "\n";
-		strMsg += data;
-		label->setString(strMsg);
+		label->setString(data);
 	}
 #endif
 }
@@ -134,6 +133,20 @@ void Bluetooth::CheckConnectionState(int state)
 							{
 								label->setString("Connected");
 							}
+							auto menu = dynamic_cast<Menu*>(getChildByTag(eChild_Menu));
+							if (menu)
+							{
+								auto item = dynamic_cast<MenuItem*>(menu->getChildByTag(eChild_StartGameItem));
+								if (item)
+								{
+									item->setVisible(true);
+								}
+								item = dynamic_cast<MenuItem*>(menu->getChildByTag(eChild_CheckBluetoothItem));
+								if (item)
+								{
+									item->setVisible(false);
+								}
+							}
 	}
 		break;
 	case STATE_CONNECTING:
@@ -160,6 +173,15 @@ void Bluetooth::CheckConnectionState(int state)
 					   if (label)
 					   {
 						   label->setString("Listening");
+					   }
+					   auto menu = dynamic_cast<Menu*>(getChildByTag(eChild_Menu));
+					   if (menu)
+					   {
+						   auto item = dynamic_cast<MenuItem*>(menu->getChildByTag(eChild_CheckBluetoothItem));
+						   if (item)
+						   {
+							   item->setVisible(true);
+						   }
 					   }
 	}
 		break;

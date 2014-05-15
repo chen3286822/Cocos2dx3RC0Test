@@ -13,7 +13,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Dialog.cpp \
 				   ../../Classes/MainTitleScene.cpp \
 				   ../../Classes/BluetoothScene.cpp \
-				   ../../Classes/JNIFunc.cpp
+				   ../../Classes/JNIFunc.cpp \
+				   ../../Classes/Unity.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 				../../cocos2d/extensions \

@@ -98,6 +98,26 @@ public class Cocos2dxActivity extends NativeActivity{
 					JniHelper.showTipDialog("Error","No bluetooth available!",Cocos2dxActivity.NO_BLUETOOTH_DIALOG);
 					return;
 				}
+				
+				if (!mBluetoothAdapter.isEnabled())
+				{
+					ToastMsg("Bluetooth is disabled now!",Toast.LENGTH_SHORT);
+					
+					Message msgEnableBT = handler.obtainMessage();
+					msgEnableBT.what = Cocos2dxActivity.ASK_ENABLE_BLUETOOTH;
+					msgEnableBT.sendToTarget();
+					return;
+				}
+				
+				if (mConnecttService == null)
+				{
+					mConnecttService = new BluetoothConnectionService(Cocos2dxActivity.this, handler);
+		            // Only if the state is STATE_NONE, do we know that we haven't started already
+		            if (mConnecttService.getState() == BluetoothConnectionService.STATE_NONE) {
+		              // Start the Bluetooth chat services
+		            	mConnecttService.start();
+		            }
+				}
 			}
 				break;
 			case CONNECT_BLUETOOTH:

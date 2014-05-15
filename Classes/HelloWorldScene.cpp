@@ -1,6 +1,7 @@
 #include "HelloWorldScene.h"
 #include "Dialog.h"
 #include "JNIFunc.h"
+#include "Unity.h"
 
 USING_NS_CC;
 
@@ -29,7 +30,7 @@ bool HelloWorld::init()
 		return false;
 	}
 
-	m_nHighScore = UserDefault::getInstance()->getIntegerForKey("Score", 0);
+	m_nHighScore = UserDefault::getInstance()->getIntegerForKey("Score", 19996);
 
 	auto listener = EventListenerKeyboard::create();
 	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
@@ -85,7 +86,7 @@ bool HelloWorld::init()
 	spriteNewGame->setPosition(cocos2d::Point(m_nOffsetX + 4 * m_nRectLength - m_nBorder, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
 	addChild(spriteNewGame, 1);
 
-	auto labelRestart = LabelTTF::create("New Game", "Arial", 20);
+	auto labelRestart = LabelTTF::create("New Game", unity::GetDefaultFontType(), 20);
 	labelRestart->setColor(Color3B(249,246,242));
 	auto restartItem = MenuItemLabel::create(labelRestart, CC_CALLBACK_1(HelloWorld::Restart, this));
 	restartItem->setAnchorPoint(Point(0.5, 0.5));
@@ -103,7 +104,7 @@ bool HelloWorld::init()
 	spriteScore->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
 	addChild(spriteScore, 1);
 
-	auto label = LabelTTF::create("", "Arial", m_nCardLength / 6);
+	auto label = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 6);
 	char temp[20];
 	sprintf(temp, "SCORE");
 	label->setString(temp);
@@ -111,7 +112,7 @@ bool HelloWorld::init()
 	label->setPosition(cocos2d::Point(m_nOffsetX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteScore->getTextureRect().size.height*spriteScore->getScaleY() * 3 / 4));
 	addChild(label,2);
 
-	auto labelPt = LabelTTF::create("", "Arial", m_nCardLength / 4);
+	auto labelPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
 	sprintf(temp, "%d", m_nPoint);
 	labelPt->setString(temp);
 	labelPt->setColor(Color3B::WHITE);
@@ -128,14 +129,14 @@ bool HelloWorld::init()
 	spriteBest->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder + bestScoreOffsetY));
 	addChild(spriteBest, 1);
 
-	label = LabelTTF::create("", "Arial", m_nCardLength / 6);
+	label = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 6);
 	sprintf(temp, "BEST");
 	label->setString(temp);
 	label->setColor(Color3B(238, 228, 218));
 	label->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteBest->getTextureRect().size.height*spriteBest->getScaleY() * 3 / 4 + bestScoreOffsetY));
 	addChild(label, 2);
 
-	auto labelHighPt = LabelTTF::create("", "Arial", m_nCardLength / 4);
+	auto labelHighPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
 	sprintf(temp, "%d", m_nHighScore);
 	labelHighPt->setString(temp);
 	labelHighPt->setColor(Color3B::WHITE);

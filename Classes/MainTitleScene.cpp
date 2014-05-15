@@ -1,6 +1,7 @@
 #include "MainTitleScene.h"
 #include "HelloWorldScene.h"
 #include "BluetoothScene.h"
+#include "Unity.h"
 
 USING_NS_CC;
 
@@ -31,18 +32,18 @@ bool MainTitle::init()
 	Point origin = Director::getInstance()->getVisibleOrigin();
 
 	//List
-	auto labelSingleMode = LabelTTF::create("Single Mode", "Arial", 20);
+	auto labelSingleMode = LabelTTF::create("Single Mode", unity::GetDefaultFontType(), 25);
 	auto itemSingleMode = MenuItemLabel::create(labelSingleMode, CC_CALLBACK_1(MainTitle::SingleMode,this));
 
-	auto labelBluetoothMode = LabelTTF::create("Bluetooth Mode", "Arial", 20);
+	auto labelBluetoothMode = LabelTTF::create("Bluetooth Mode", unity::GetDefaultFontType(), 25);
 	auto itemBluetoothMode = MenuItemLabel::create(labelBluetoothMode, CC_CALLBACK_1(MainTitle::BluetoothMode,this));
 
-	auto labelExit = LabelTTF::create("Exit", "Arial", 20);
+	auto labelExit = LabelTTF::create("Exit", unity::GetDefaultFontType(), 25);
 	auto itemExit = MenuItemLabel::create(labelExit, CC_CALLBACK_1(MainTitle::Exit,this));
 
 	auto menu = Menu::create(itemSingleMode, itemBluetoothMode, itemExit, NULL);
 	menu->setPosition(Point(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
-	menu->alignItemsVerticallyWithPadding(20);
+	menu->alignItemsVerticallyWithPadding(25);
 	this->addChild(menu, 1, eChild_Menu);
 	return true;
 }

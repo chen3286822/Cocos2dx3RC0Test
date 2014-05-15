@@ -1,4 +1,5 @@
 #include "Dialog.h"
+#include "Unity.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -50,7 +51,7 @@ void Dialog::onEnter()
 	{
 		auto titleLabel = static_cast<Text*>(Helper::seekWidgetByName(m_pLayout, "TitleLabel"));
 		//这里需要重新设置下字体，因为中文字体名称在读取json文件时变成乱码
-		titleLabel->setFontName("Arial");
+		titleLabel->setFontName(unity::GetDefaultFontType());
 		titleLabel->setText(m_strTitle);
 // 		auto titleLabel = LabelTTF::create(m_strTitle, "Arial", 40);
 // 		titleLabel->setColor(Color3B(30, 30, 30));
@@ -61,7 +62,7 @@ void Dialog::onEnter()
 	if (!m_strContent.empty())
 	{
 		auto contentLabel = static_cast<Text*>(Helper::seekWidgetByName(m_pLayout, "ContentLabel"));
-		contentLabel->setFontName("Arial");
+		contentLabel->setFontName(unity::GetDefaultFontType());
 		contentLabel->setText(m_strContent);
 		contentLabel->setFontSize(18);
 // 		auto contentLabel = LabelTTF::create(m_strContent, "Arial", 25, cocos2d::Size(visibleSize.width * 4 / 5, visibleSize.height / 5));
@@ -81,7 +82,7 @@ void Dialog::onEnter()
 
 			//暂时只容纳一个按钮及其回调函数
 			m_pButton->setTitleText(textButton.m_strText);
-			m_pButton->setTitleFontName("Arial");
+			m_pButton->setTitleFontName(unity::GetDefaultFontType());
 			m_pButton->setTitleFontSize(20);
 			m_pButton->setTitleColor(Color3B::BLACK);
 			break;

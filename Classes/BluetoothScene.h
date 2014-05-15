@@ -17,7 +17,9 @@ public:
 	enum eChild
 	{
 		eChild_BluetoothLayer,
+		eChild_Menu,
 		eChild_CheckBluetoothItem,
+		eChild_StartGameItem,
 		eChild_ShowLabel,
 	};
 
@@ -33,8 +35,7 @@ public:
 	void CheckBluetooth(cocos2d::Ref* pSender);
 	void AddDevice(std::string name, std::string MAC);
 	void CheckConnectionState(int state);
-	//test
-	void SendMessage(cocos2d::Ref* pSender);
+	void StartGame(cocos2d::Ref* pSender);
 	void GetMessage(const char* data);
 
 	// implement the "static create()" method manually
