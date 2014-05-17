@@ -65,6 +65,30 @@ extern "C"
 		}
 	}
 
+	unsigned long getTickCount()
+	{
+		JniMethodInfo t;
+		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "getTickCount", "()J"))
+		{
+			jlong jData = 	t.env->CallStaticLongMethod(t.classID, t.methodID);
+			return (long)jData;
+		}
+		return 0;
+	}
+
+	void debugLog(const char* tag,const char* data)
+	{
+		JniMethodInfo t;
+		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "debugLog", "(Ljava/lang/String;Ljava/lang/String;)V"))
+		{
+			jstring jTag = t.env->NewStringUTF(tag);
+			jstring jData = t.env->NewStringUTF(data);
+			t.env->CallStaticVoidMethod(t.classID, t.methodID, jTag, jData);
+			t.env->DeleteLocalRef(jTag);
+			t.env->DeleteLocalRef(jData);
+		}
+	}
+
 
 	void Java_org_cocos2dx_cpp_JniHelper_exitApp(JNIEnv *env, jobject thiz)
 	{

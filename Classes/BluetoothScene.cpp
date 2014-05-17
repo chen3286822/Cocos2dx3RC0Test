@@ -1,6 +1,7 @@
 #include "BluetoothScene.h"
 #include "Dialog.h"
 #include "MainTitleScene.h"
+#include "HelloWorldScene.h"
 #include "JNIFunc.h"
 #include "Unity.h"
 
@@ -35,6 +36,9 @@ bool Bluetooth::init()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	m_vDevices.clear();
+	m_bGetStartInformed = false;
+	m_dwStartTime = 0;
+	m_nStartSeconds = 0;
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
@@ -48,7 +52,7 @@ bool Bluetooth::init()
 	bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
 
 	//begin game menu item
- 	auto labelStart = LabelTTF::create("Start Game", unity::GetDefaultFontType(), 25);
+ 	auto labelStart = LabelTTF::create("Restart Game", unity::GetDefaultFontType(), 25);
 	labelStart->setColor(Color3B(249, 246, 242));
 	auto startItem = MenuItemLabel::create(labelStart, CC_CALLBACK_1(Bluetooth::StartGame, this));
 	startItem->setPosition(Point(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
@@ -98,7 +102,13 @@ void Bluetooth::GetMessage(const char* data)
 	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
 	if (label)
 	{
-		label->setString(data);
+		if(strcmp(data,"Start") == 0)
+		{	
+			m_bGetStartInformed = true;
+			unity::Log(TAG,"I was informed!");
+		}
+		else
+			label->setString(data);
 	}
 #endif
 }
@@ -121,6 +131,44 @@ void Bluetooth::AddDevice(std::string name, std::string MAC)
 #endif
 }
 
+void Bluetooth::update(float fDelta)
+{
+	if (m_bGetStartInformed && m_nStartSeconds >= 3)
+	{
+		//inform other player to start
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		sendMessage("Start");
+		unity::Log(TAG,"go to the game scene!");
+#endif
+		//start game
+		Director::getInstance()->replaceScene(HelloWorld::createScene());
+
+		unscheduleUpdate();
+		return;
+	}
+	unsigned long curTime = unity::GetTickCountX();
+	//unity::Log("2048debug","curTime: %ld", curTime);
+	if (m_dwStartTime + 1000 <= curTime && m_nStartSeconds < 3)
+	{
+		m_dwStartTime = curTime;
+		auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+		if (label)
+		{
+			//unity::Log("2048debug", "after %d the game will start", 3 - m_nStartSeconds);
+			label->setString(StringUtils::format("The game will start in %d...", 3-m_nStartSeconds));
+		}
+		m_nStartSeconds++;
+		if (m_nStartSeconds >= 3)
+		{
+			//inform other player to start
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			unity::Log(TAG,"inform game start");
+			sendMessage("Start");
+#endif
+		}
+	}
+}
+
 void Bluetooth::CheckConnectionState(int state)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -136,17 +184,17 @@ void Bluetooth::CheckConnectionState(int state)
 							auto menu = dynamic_cast<Menu*>(getChildByTag(eChild_Menu));
 							if (menu)
 							{
-								auto item = dynamic_cast<MenuItem*>(menu->getChildByTag(eChild_StartGameItem));
-								if (item)
-								{
-									item->setVisible(true);
-								}
-								item = dynamic_cast<MenuItem*>(menu->getChildByTag(eChild_CheckBluetoothItem));
+								auto item = dynamic_cast<MenuItem*>(menu->getChildByTag(eChild_CheckBluetoothItem));
 								if (item)
 								{
 									item->setVisible(false);
 								}
 							}
+							//add a update scheduler
+							unscheduleUpdate();
+							scheduleUpdate();
+							m_dwStartTime = unity::GetTickCountX();
+							unity::Log(TAG,"update scheduled! time is:%ld",m_dwStartTime);
 	}
 		break;
 	case STATE_CONNECTING:

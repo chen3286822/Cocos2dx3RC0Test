@@ -26,6 +26,7 @@ public:
 	static cocos2d::Scene* createScene();
 
 	virtual bool init();
+	virtual void update(float fDelta);
 	void BackToMainTitle(cocos2d::Ref* pSender);
 
 	//½ÓÊÜ·µ»Ø¼ü
@@ -43,6 +44,10 @@ public:
 
 private:
 	VDeviceMAC m_vDevices;
+
+	unsigned long m_dwStartTime{ 0 };
+	int m_nStartSeconds{ 0 };
+	bool m_bGetStartInformed{ false };
 };
 
 #endif

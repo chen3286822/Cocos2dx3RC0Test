@@ -15,6 +15,8 @@
 #define STATE_LISTEN 1					//监听状态
 #define STATE_CONNECTING 2		//主动连接中状态
 #define STATE_CONNECTED 3		//已经连接状态，可以收发数据了
+
+#define TAG "2048Debug"
 extern "C"
 {
 	void showTipDialog(const char* title, const char* msg, int msgID);
@@ -22,6 +24,8 @@ extern "C"
 	void initBluetooth();
 	void stopBluetooth();
 	void sendMessage(const char* data);
+	unsigned long getTickCount();
+	void debugLog(const char* tag,const char* data);
 }
 #endif
 

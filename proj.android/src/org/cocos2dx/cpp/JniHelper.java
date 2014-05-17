@@ -3,6 +3,8 @@ package org.cocos2dx.cpp;
 
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
+import android.util.Log;
 
 public class JniHelper {
 	private static Handler mHandler;
@@ -53,6 +55,16 @@ public class JniHelper {
 		msg.what = Cocos2dxActivity.SEND_MESSAGE;
 		msg.obj = data;
 		msg.sendToTarget();
+	}
+	
+	public static long getTickCount()
+	{
+		return SystemClock.uptimeMillis();
+	}
+	
+	public static void debugLog(final String tag,final String data)
+	{
+		Log.d(tag,data);
 	}
 	
 	public static native void stopBluetoothCheck();
