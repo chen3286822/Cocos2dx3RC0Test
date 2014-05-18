@@ -144,6 +144,7 @@ xcopy /Y /Q "$(EngineRoot)external\websockets\prebuilt\win32\*.*" "$(OutDir)"</C
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\JNIFunc.cpp" />
     <ClCompile Include="..\Classes\MainTitleScene.cpp" />
+    <ClCompile Include="..\Classes\Transform.cpp" />
     <ClCompile Include="..\Classes\Unity.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -155,6 +156,7 @@ xcopy /Y /Q "$(EngineRoot)external\websockets\prebuilt\win32\*.*" "$(OutDir)"</C
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\JNIFunc.h" />
     <ClInclude Include="..\Classes\MainTitleScene.h" />
+    <ClInclude Include="..\Classes\Transform.h" />
     <ClInclude Include="..\Classes\Unity.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>

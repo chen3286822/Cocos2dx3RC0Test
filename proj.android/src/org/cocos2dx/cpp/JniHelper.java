@@ -51,10 +51,11 @@ public class JniHelper {
 	
 	public static void sendMessage(final String data)
 	{
-		Message msg = mHandler.obtainMessage();
-		msg.what = Cocos2dxActivity.SEND_MESSAGE;
-		msg.obj = data;
-		msg.sendToTarget();
+		//Message msg = mHandler.obtainMessage();
+		//msg.what = Cocos2dxActivity.SEND_MESSAGE;
+		//msg.obj = data;
+		//msg.sendToTarget();
+		getMessage(data);
 	}
 	
 	public static long getTickCount()

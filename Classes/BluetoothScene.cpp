@@ -92,7 +92,7 @@ void Bluetooth::CheckBluetooth(Ref* pSender)
 void Bluetooth::StartGame(cocos2d::Ref* pSender)
 {
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	sendMessage("Hello!");
+	//sendMessage("Hello!");
 #endif
 }
 
@@ -137,7 +137,8 @@ void Bluetooth::update(float fDelta)
 	{
 		//inform other player to start
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		sendMessage("Start");
+
+		g_Transform.Send_Start();
 		unity::Log(TAG,"go to the game scene!");
 #endif
 		//start game
@@ -163,7 +164,7 @@ void Bluetooth::update(float fDelta)
 			//inform other player to start
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 			unity::Log(TAG,"inform game start");
-			sendMessage("Start");
+			g_Transform.Send_Start();
 #endif
 		}
 	}

@@ -2,6 +2,7 @@
 #include "Dialog.h"
 #include "JNIFunc.h"
 #include "Unity.h"
+#include "Transform.h"
 
 USING_NS_CC;
 
@@ -195,6 +196,33 @@ bool HelloWorld::init()
 // 	dialog->SetContent(temp);
 // 	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
 // 	addChild(dialog, 2);
+
+	Send_Begin(MSG_POINT);
+	ADD_INT(5);
+	ADD_STR("Aaa");
+	Send_END();
+// 	char* ca = "555";
+// 	std::string s1 = "111";
+// 	std::string s2 = "aaa";
+// 	char temp2[256] = { 0 };
+// 	int l1 = 0;
+// 	memcpy(temp2, &iA, sizeof(iA));
+// 	l1 += sizeof(iA);
+// 	int lca = strlen(ca);
+// 	memcpy(temp2 + l1, &lca, 4);
+// 	l1 += 4;
+// 	memcpy(temp2 + l1, ca, lca);
+// 	l1 += lca;
+// 	int ls1 = s1.length();
+// 	memcpy(temp2 + l1, &ls1, 4);
+// 	l1 += 4;
+// 	memcpy(temp2 + l1, s1.data(), ls1);
+// 	l1 += ls1;
+// 	int ls2 = s2.length();
+// 	memcpy(temp2 + l1, &ls2, 4);
+// 	l1 += 4;
+// 	memcpy(temp2 + l1, s2.data(), ls2);
+// 	g_Transform.Parse(temp2);
 	return true;
 }
 

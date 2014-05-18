@@ -1,6 +1,8 @@
 #include "JNIFunc.h"
 #include "cocos2d.h"
 #include "BluetoothScene.h"
+#include "Transform.h"
+#include "Unity.h"
 
 USING_NS_CC;
 
@@ -123,13 +125,21 @@ extern "C"
 	void Java_org_cocos2dx_cpp_JniHelper_getMessage(JNIEnv *env, jobject thiz, jstring jdata)
 	{
 		jboolean iscopy;
+		unity::Log(TAG, "begin conv");
 		const char* data = env->GetStringUTFChars(jdata, &iscopy);
+		unity::Log(TAG, "data length:%d",strlen(data));
+		char temp[MSG_LENGTH] = {0};
+		memcpy(temp,data,MSG_LENGTH-1);
+		temp[MSG_LENGTH-1] = '\0';
+		//unity::Log(TAG, "conv : %s", temp);
 		//处理数据
-		auto layer = dynamic_cast<Bluetooth*>(CCDirector::getInstance()->getRunningScene()->getChildByTag(Bluetooth::eChild_BluetoothLayer));
-		if(layer)
-		{
-			layer->GetMessage(data);
-		}
+		g_Transform.Parse(temp);
+		unity::Log(TAG, "parse over");
+// 		auto layer = dynamic_cast<Bluetooth*>(CCDirector::getInstance()->getRunningScene()->getChildByTag(Bluetooth::eChild_BluetoothLayer));
+// 		if(layer)
+// 		{
+// 			layer->GetMessage(data);
+// 		}
 		env->ReleaseStringUTFChars(jdata, data);
 	}
 

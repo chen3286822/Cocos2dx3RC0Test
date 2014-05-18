@@ -39,6 +39,8 @@ public:
 	void StartGame(cocos2d::Ref* pSender);
 	void GetMessage(const char* data);
 
+	void InformToStart(){ m_bGetStartInformed = true; }
+
 	// implement the "static create()" method manually
 	CREATE_FUNC(Bluetooth);
 

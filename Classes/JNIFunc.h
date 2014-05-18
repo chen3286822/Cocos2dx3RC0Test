@@ -16,7 +16,6 @@
 #define STATE_CONNECTING 2		//主动连接中状态
 #define STATE_CONNECTED 3		//已经连接状态，可以收发数据了
 
-#define TAG "2048Debug"
 extern "C"
 {
 	void showTipDialog(const char* title, const char* msg, int msgID);
