@@ -6,9 +6,9 @@ namespace unity
 	const char* GetDefaultFontType()
 	{
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		return "DroidSans";
+		return "fonts/American Typewriter.ttf";
 #elif(CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-		return "Arial";
+		return "fonts/American Typewriter.ttf";
 #endif
 	}
 

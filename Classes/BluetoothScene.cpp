@@ -72,6 +72,7 @@ bool Bluetooth::init()
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	initBluetooth();
 #endif
+
 	return true;
 }
 
@@ -148,7 +149,6 @@ void Bluetooth::update(float fDelta)
 		return;
 	}
 	unsigned long curTime = unity::GetTickCountX();
-	//unity::Log("2048debug","curTime: %ld", curTime);
 	if (m_dwStartTime + 1000 <= curTime && m_nStartSeconds < 3)
 	{
 		m_dwStartTime = curTime;

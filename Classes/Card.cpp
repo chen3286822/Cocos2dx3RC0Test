@@ -144,7 +144,7 @@ bool Card::init(int length)
 	m_pCardTex->setAnchorPoint(cocos2d::Point(0, 0));
 	addChild(m_pCardTex, 1, eChild_CardTex);
 
-	auto label = LabelTTF::create("", unity::GetDefaultFontType(), length / 2);
+	auto label = LabelTTF::create("", "fonts/arial.ttf", length / 2);
 	//label->setAnchorPoint(cocos2d::Point(0.5, 0.5));
 	label->setPosition(Point(length / 2, length/2));
 	addChild(label, 1, eChild_Label);

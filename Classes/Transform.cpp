@@ -50,9 +50,9 @@ char* Transform::Decode(const char* data)
 
 void Transform::Parse(const char* data)
 {
-	unity::Log(TAG, "begin decode");
+	//unity::Log(TAG, "begin decode");
 	Decode(data);
-	unity::Log(TAG, "decode over");
+	//unity::Log(TAG, "decode over");
 
 	//parse the protocol header
 	int header = 0;
@@ -68,13 +68,8 @@ void Transform::Parse(const char* data)
 
 void Transform::Send_Start()
 {
-	Send_Begin(MSG_POINT);
-	ADD_INT(5);
-	ADD_STR("aa");
-	//Send_END();
-#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-sendMessage(tempSend);
-#endif
+	Send_Begin(MSG_START);
+	Send_END();
 }
 
 /*
@@ -113,13 +108,4 @@ void Transform::Msg_Point(const char* data)
 	memcpy(&point, data, sizeof(point));
 	index += sizeof(point);
 	unity::Log(TAG, "point : %d", point);
-	//test
-	char temp[50];
-	int length = 0;
-	memcpy(&length, data + index, sizeof(length));
-	index += sizeof(length);
-	unity::Log(TAG, "str length : %d", length);
-	memcpy(temp, data + index, length);
-	temp[length] = '\0';
-	unity::Log(TAG, "str : %s", temp);
 }

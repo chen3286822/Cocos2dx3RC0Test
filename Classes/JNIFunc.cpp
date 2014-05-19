@@ -22,6 +22,7 @@ extern "C"
 			t.env->CallStaticVoidMethod(t.classID, t.methodID, jTitle, jMsg, jMsgID);
 			t.env->DeleteLocalRef(jTitle);
 			t.env->DeleteLocalRef(jMsg);
+			t.env->DeleteLocalRef(t.classID);
 		}
 	}
 
@@ -32,6 +33,7 @@ extern "C"
 		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "connectBluetooth", "()V"))
 		{
 			t.env->CallStaticVoidMethod(t.classID, t.methodID);
+			t.env->DeleteLocalRef(t.classID);
 		}
 	}
 
@@ -42,6 +44,7 @@ extern "C"
 		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "initBluetooth", "()V"))
 		{
 			t.env->CallStaticVoidMethod(t.classID, t.methodID);
+			t.env->DeleteLocalRef(t.classID);
 		}
 	}
 
@@ -52,6 +55,7 @@ extern "C"
 		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "stopBluetooth", "()V"))
 		{
 			t.env->CallStaticVoidMethod(t.classID, t.methodID);
+			t.env->DeleteLocalRef(t.classID);
 		}
 	}
 
@@ -64,6 +68,7 @@ extern "C"
 			jstring jData = t.env->NewStringUTF(data);
 			t.env->CallStaticVoidMethod(t.classID, t.methodID,jData);
 			t.env->DeleteLocalRef(jData);
+			t.env->DeleteLocalRef(t.classID);
 		}
 	}
 
@@ -73,6 +78,7 @@ extern "C"
 		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "getTickCount", "()J"))
 		{
 			jlong jData = 	t.env->CallStaticLongMethod(t.classID, t.methodID);
+			t.env->DeleteLocalRef(t.classID);
 			return (long)jData;
 		}
 		return 0;
@@ -88,6 +94,7 @@ extern "C"
 			t.env->CallStaticVoidMethod(t.classID, t.methodID, jTag, jData);
 			t.env->DeleteLocalRef(jTag);
 			t.env->DeleteLocalRef(jData);
+			t.env->DeleteLocalRef(t.classID);
 		}
 	}
 
@@ -125,13 +132,13 @@ extern "C"
 	void Java_org_cocos2dx_cpp_JniHelper_getMessage(JNIEnv *env, jobject thiz, jstring jdata)
 	{
 		jboolean iscopy;
-		unity::Log(TAG, "begin conv");
+		//unity::Log(TAG, "begin conv");
 		const char* data = env->GetStringUTFChars(jdata, &iscopy);
-		unity::Log(TAG, "data length:%d",strlen(data));
+		//unity::Log(TAG, "data length:%d",strlen(data));
 		char temp[MSG_LENGTH] = {0};
 		memcpy(temp,data,MSG_LENGTH-1);
 		temp[MSG_LENGTH-1] = '\0';
-		//unity::Log(TAG, "conv : %s", temp);
+		//unity::Log(TAG, "temp : %s", temp);
 		//处理数据
 		g_Transform.Parse(temp);
 		unity::Log(TAG, "parse over");

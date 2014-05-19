@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 #include <map>
 
-#define MSG_LENGTH 256
+#define MSG_LENGTH 128
 /*
 消息前4字节为协议头，int类型
 后面为协议数据，如果是int型，则直接填充，占4字节
