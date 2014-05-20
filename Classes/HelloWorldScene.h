@@ -73,6 +73,7 @@ private:
 	int  m_nOffsetY;			
 
 	cocos2d::Point m_iStartPt;			//记录每次开始触摸的开始点坐标，用于判断滑动方向
+	bool m_bMoving{ false };		//判断卡片是否在移动中，用于决定是否接受触摸操作
 };
 
 #endif // __HELLOWORLD_SCENE_H__

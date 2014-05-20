@@ -278,7 +278,15 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 
 bool HelloWorld::onTouchBegan(Touch* touch, Event* event)
 {
+	if (m_bMoving)
+		return false;
+
+	//记录一次触摸开始
+	m_bMoving = true;
+
 	m_iStartPt = touch->getLocation();
+	CCLOG("start x: %f y:%f", m_iStartPt.x, m_iStartPt.y);
+	
 	return true;
 }
 
@@ -290,6 +298,12 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event)
 void HelloWorld::onTouchEnded(Touch* touch, Event* event)
 {
 	Point endPt = touch->getLocation();
+
+	//一次触摸结束
+	m_bMoving = false;
+
+	CCLOG("end x: %f y:%f", endPt.x, endPt.y);
+
 	if (abs(m_iStartPt.x - endPt.x) > abs(m_iStartPt.y - endPt.y) && abs(m_iStartPt.x - endPt.x) > 50)
 	{
 		if (m_iStartPt.x > endPt.x)
@@ -304,7 +318,6 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
 		else
 			MoveAndMergeCard(EventKeyboard::KeyCode::KEY_UP_ARROW);
 	}
-	
 }
 
 void HelloWorld::MoveAction(int x, int y,cocos2d::EventKeyboard::KeyCode dir)
