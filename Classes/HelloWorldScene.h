@@ -28,6 +28,7 @@ public:
 		eChild_HelloWorldLayer,
 		eChild_Point,
 		eChild_HighPoint,
+		eChild_OtherPoint,
 	};
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene();
@@ -49,6 +50,8 @@ public:
 	void AddNewCard();
 	Card* FindCard(int x,int y);
 	void Restart(cocos2d::Ref* pSender);
+
+	void AddOtherPoint(int pt);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);

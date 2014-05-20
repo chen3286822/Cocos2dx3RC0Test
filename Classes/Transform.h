@@ -55,6 +55,7 @@ public:
 	void Send_Start();
 	void Msg_Start(const char* data);
 	void Msg_Init_Card(const char* data);
+	void Send_Point(int pt);
 	void Msg_Point(const char* data);
 private:
 	char m_strMsg[MSG_LENGTH];

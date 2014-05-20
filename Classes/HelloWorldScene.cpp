@@ -105,15 +105,13 @@ bool HelloWorld::init()
 	spriteScore->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
 	addChild(spriteScore, 1);
 
-	auto label = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 6);
-	char temp[20];
-	sprintf(temp, "SCORE");
-	label->setString(temp);
+	auto label = LabelTTF::create("SCORE", unity::GetDefaultFontType(), m_nCardLength / 6);
 	label->setColor(Color3B(238,228,218));
 	label->setPosition(cocos2d::Point(m_nOffsetX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteScore->getTextureRect().size.height*spriteScore->getScaleY() * 3 / 4));
 	addChild(label,2);
 
 	auto labelPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
+	char temp[20];
 	sprintf(temp, "%d", m_nPoint);
 	labelPt->setString(temp);
 	labelPt->setColor(Color3B::WHITE);
@@ -130,9 +128,7 @@ bool HelloWorld::init()
 	spriteBest->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder + bestScoreOffsetY));
 	addChild(spriteBest, 1);
 
-	label = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 6);
-	sprintf(temp, "BEST");
-	label->setString(temp);
+	label = LabelTTF::create("BEST", unity::GetDefaultFontType(), m_nCardLength / 6);
 	label->setColor(Color3B(238, 228, 218));
 	label->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteBest->getTextureRect().size.height*spriteBest->getScaleY() * 3 / 4 + bestScoreOffsetY));
 	addChild(label, 2);
@@ -144,6 +140,12 @@ bool HelloWorld::init()
 	labelHighPt->setAnchorPoint(cocos2d::Point(0.5, 0));
 	labelHighPt->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + bestScoreOffsetY));
 	addChild(labelHighPt, 2, eChild_HighPoint);
+
+	//other point
+	auto labelOtherPt = LabelTTF::create("OTHER SCORE: 0", unity::GetDefaultFontType(), m_nCardLength / 6);
+	labelOtherPt->setColor(Color3B::BLUE);
+	labelOtherPt->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + bestScoreOffsetY + bestScoreOffsetY));
+	addChild(labelOtherPt, 2, eChild_OtherPoint);
 
 	//Ìí¼Óµ×Í¼
 	for (int i = 0; i < 16; i++)
@@ -592,6 +594,17 @@ void HelloWorld::RemoveMergedCardAndDoubleNum(int x, int y, EventKeyboard::KeyCo
 	AddNewCard();
 }
 
+void HelloWorld::AddOtherPoint(int pt)
+{
+	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_OtherPoint));
+	if (label)
+	{
+		char temp[20];
+		sprintf(temp, "OTHER SCORE: %d", pt);
+		label->setString(temp);
+	}
+}
+
 void HelloWorld::AddPoint(int pt)
 {
 	m_nPoint += pt;
@@ -611,6 +624,8 @@ void HelloWorld::AddPoint(int pt)
 		auto zoomAction2 = ScaleTo::create(0.2f, _originalScale);
 		auto sequenceAction = Sequence::create(zoomAction1, zoomAction2, NULL);
 		label->runAction(sequenceAction);
+
+		g_Transform.Send_Point(m_nPoint);
 	}
 }
 

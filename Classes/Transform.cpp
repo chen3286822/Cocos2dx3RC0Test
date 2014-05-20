@@ -2,6 +2,7 @@
 #include "Unity.h"
 #include "JNIFunc.h"
 #include "BluetoothScene.h"
+#include "HelloWorldScene.h"
 #include <string>
 
 Transform g_Transform;
@@ -101,6 +102,13 @@ void Transform::Msg_Init_Card(const char* data)
 /*
 	int : ·ÖÊý
 */
+void Transform::Send_Point(int pt)
+{
+	Send_Begin(MSG_POINT);
+	ADD_INT(pt);
+	Send_END();
+}
+
 void Transform::Msg_Point(const char* data)
 {
 	int point = 0;
@@ -108,4 +116,10 @@ void Transform::Msg_Point(const char* data)
 	memcpy(&point, data, sizeof(point));
 	index += sizeof(point);
 	unity::Log(TAG, "point : %d", point);
+
+	auto layer = dynamic_cast<HelloWorld*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
+	if(layer)
+	{
+		layer->AddOtherPoint(point);
+	}
 }
