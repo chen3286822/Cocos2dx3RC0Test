@@ -6,8 +6,8 @@
 
 #define MSG_LENGTH 128
 /*
-消息前4字节为协议头，int类型
-后面为协议数据，如果是int型，则直接填充，占4字节
+消息前4字节为协议头，int类型，后面为协议数据
+如果是int型，则首先填充1字节的字符表示该int的字符长度，后填充该int的字符串形式，限制是int长度不能超过9
 如果是string，则先填充4字节的字符串长度，再填充字符串本身
 整个消息中如果含有'\0'(非结尾处)，则替换为'~'，防止字符串截断
 */
@@ -18,9 +18,11 @@
 	memcpy(tempSend, &tempInter, sizeof(tempInter)); \
 	tempIndex += sizeof(tempInter); \
 	
-#define ADD_INT(a) tempInter = a; \
-	memcpy(tempSend + tempIndex, &tempInter, sizeof(tempInter)); \
-	tempIndex += sizeof(tempInter);
+#define ADD_INT(a) tempSend[tempIndex] = '0' + unity::GetDigits(a); \
+	tempIndex++; \
+	sprintf(tempSend+tempIndex,"%d",a); \
+	tempIndex += (a/10 + 1);
+
 #define ADD_STR(a) tempInter = strlen(a); \
 	tempChar = a; \
 	memcpy(tempSend + tempIndex, &tempInter, sizeof(tempInter)); \

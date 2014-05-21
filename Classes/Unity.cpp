@@ -39,4 +39,15 @@ namespace unity
 		
 
 	}
+
+	int GetDigits(int a)
+	{
+		int digits = 1;
+		while (a >= 10)
+		{
+			a = a / 10;
+			digits++;
+		}
+		return digits;
+	}
 }

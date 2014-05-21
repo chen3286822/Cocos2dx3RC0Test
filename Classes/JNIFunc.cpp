@@ -141,7 +141,7 @@ extern "C"
 		//unity::Log(TAG, "temp : %s", temp);
 		//处理数据
 		g_Transform.Parse(temp);
-		unity::Log(TAG, "parse over");
+		//unity::Log(TAG, "parse over");
 // 		auto layer = dynamic_cast<Bluetooth*>(CCDirector::getInstance()->getRunningScene()->getChildByTag(Bluetooth::eChild_BluetoothLayer));
 // 		if(layer)
 // 		{

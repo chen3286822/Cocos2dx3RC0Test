@@ -199,10 +199,8 @@ bool HelloWorld::init()
 // 	dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
 // 	addChild(dialog, 2);
 
-// 	Send_Begin(MSG_POINT);
-// 	ADD_INT(5);
-// 	ADD_STR("Aaa");
-// 	Send_END();
+
+
 // 	char* ca = "555";
 // 	std::string s1 = "111";
 // 	std::string s2 = "aaa";
@@ -287,7 +285,7 @@ bool HelloWorld::onTouchBegan(Touch* touch, Event* event)
 	m_bMoving = true;
 
 	m_iStartPt = touch->getLocation();
-	CCLOG("start x: %f y:%f", m_iStartPt.x, m_iStartPt.y);
+	//CCLOG("start x: %f y:%f", m_iStartPt.x, m_iStartPt.y);
 	
 	return true;
 }
@@ -304,7 +302,7 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
 	//Ò»´Î´¥Ãþ½áÊø
 	m_bMoving = false;
 
-	CCLOG("end x: %f y:%f", endPt.x, endPt.y);
+	//CCLOG("end x: %f y:%f", endPt.x, endPt.y);
 
 	if (abs(m_iStartPt.x - endPt.x) > abs(m_iStartPt.y - endPt.y) && abs(m_iStartPt.x - endPt.x) > 50)
 	{

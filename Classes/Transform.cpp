@@ -38,9 +38,9 @@ char* Transform::Encode(const char* data)
 
 char* Transform::Decode(const char* data)
 {
-	unity::Log(TAG, "data length:%d",strlen(data));
+	//unity::Log(TAG, "data length:%d",strlen(data));
 	memcpy(m_strMsg, data, MSG_LENGTH);
-	unity::Log(TAG, "memcpy over");
+	//unity::Log(TAG, "memcpy over");
 	for (int i = 0; i < MSG_LENGTH - 1; i++)
 	{
 		if (m_strMsg[i] == '~')
@@ -52,6 +52,7 @@ char* Transform::Decode(const char* data)
 void Transform::Parse(const char* data)
 {
 	//unity::Log(TAG, "begin decode");
+	//CCLOG("data is : %s", data);
 	Decode(data);
 	//unity::Log(TAG, "decode over");
 
@@ -111,10 +112,11 @@ void Transform::Send_Point(int pt)
 
 void Transform::Msg_Point(const char* data)
 {
-	int point = 0;
-	int index = 0;
-	memcpy(&point, data, sizeof(point));
-	index += sizeof(point);
+	int ptLength = (int)(data[0] - '0');
+	CCLOG("data is : %s", data);
+	std::string ptStr = data;
+	ptStr = ptStr.substr(1, ptLength);
+	int point = atoi(ptStr.c_str());
 	unity::Log(TAG, "point : %d", point);
 
 	auto layer = dynamic_cast<HelloWorld*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
