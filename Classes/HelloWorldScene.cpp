@@ -6,6 +6,151 @@
 
 USING_NS_CC;
 
+CardRegion* CardRegion::create(int cardLength)
+{
+	CardRegion* cardRegion = new CardRegion();
+	if (cardRegion && cardRegion->init(cardLength))
+	{
+		cardRegion->autorelease();
+		return cardRegion;
+	}
+
+	CC_SAFE_DELETE(cardRegion);
+	return nullptr;
+}
+
+bool CardRegion::init(int cardLength)
+{
+	m_nCardLength = cardLength;
+	m_nRectLength = m_nBorder + m_nCardLength;
+	//添加底图
+	for (int i = 0; i < 16; i++)
+	{
+		auto x = i / 4;
+		auto y = i % 4;
+		auto sprite = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle.png"));
+		//sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
+		sprite->setScale(m_nCardLength / sprite->getTextureRect().size.width, m_nCardLength / sprite->getTextureRect().size.height);
+		sprite->setColor(Color3B(204, 192, 178));
+		sprite->setAnchorPoint(cocos2d::Point(0, 0));
+		sprite->setPosition(cocos2d::Point(y*m_nRectLength, x*m_nRectLength));
+		addChild(sprite, 1);	
+	}
+
+	AddCard();
+	AddCard();
+
+	return true;
+}
+
+void CardRegion::AddCard()
+{
+	//计算剩余空卡
+	std::list<int> emptyCard;
+	static int allNum[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+	for (auto num : allNum)
+	{
+		emptyCard.push_back(num);
+	}
+
+	for (auto i = 0; i < 4; i++)
+	{
+		for (auto j = 0; j < 4; j++)
+		{
+			if (m_iCardPark[i][j].m_pCard)
+			{
+				cocos2d::Point& pt = m_iCardPark[i][j].m_pCard->GetPos();
+				emptyCard.remove(int(pt.x * 4 + pt.y));
+			}
+		}
+	}
+
+	if (emptyCard.size() < 1)
+	{
+		//没有空间，失败
+		return;
+	}
+	//随机选2个放置数字
+	auto index = rand() % emptyCard.size();
+
+	auto is2 = (rand() % 4) >= 1;
+	auto start = 0;
+	for (auto newCard : emptyCard)
+	{
+		if (start == index)
+		{
+			//计算卡片长宽以及位置
+			int x = newCard / 4;
+			int y = newCard % 4;
+			Card* card = Card::create(is2 ? 2 : 4, m_nCardLength);
+			addChild(card, 2);
+			card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) , x*(m_nBorder + m_nCardLength)));
+			card->GetPos().x = x;
+			card->GetPos().y = y;
+			m_iCardPark[x][y].m_pCard = card;
+			m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
+			//m_lCards.push_back(card);
+			break;
+		}
+		start++;
+	}
+
+	//检测是否无路可走
+	//没有空位时才会检测
+	if (emptyCard.size() - 1 <= 0)
+		CheckFailure();
+}
+
+void CardRegion::CheckFailure()
+{
+	//检查所有格子的上下左右，如果存在数字和自己一样的，则不会失败
+	for (auto i = 0; i < 4; i++)
+	{
+		for (auto j = 0; j < 4; j++)
+		{
+			MoveCard& moveCard = m_iCardPark[i][j];
+			int x[4] = { -1, 1, 0, 0 };
+			int y[4] = { 0, 0, 1, -1 };
+			for (auto index = 0; index < 4; index++)
+			{
+				auto x1 = x[index] + i;
+				auto y1 = y[index] + j;
+				if (x1 < 0 || x1 > 3 || y1 < 0 || y1 > 3)
+					continue;
+				MoveCard& nerghbourCard = m_iCardPark[x1][y1];
+				if (moveCard.m_pCard->getNum() == nerghbourCard.m_pCard->getNum())
+					return;
+			}
+		}
+	}
+	//游戏失败
+	CCLOG("Game Over!");
+
+	auto scene = dynamic_cast<HelloWorld*>(getParent());
+	if (scene)
+	{
+		auto dialog = Dialog::create();
+		dialog->SetTitle("Game Over");
+		char temp[255];
+		if (scene->GetPoint() > scene->GetHighPoint())
+		{
+			dialog->setNewRecord(true);
+			sprintf(temp, "A new record!\nYou got %d points!", scene->GetPoint());
+			scene->SetHighPoint(scene->GetPoint());
+			UserDefault::getInstance()->setIntegerForKey("Score", scene->GetHighPoint());
+		}
+		else
+		{
+			sprintf(temp, "You got %d points!\nBest record is %dpts.", scene->GetPoint(), scene->GetHighPoint());
+		}
+
+		dialog->SetContent(temp);
+		dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, this));
+		addChild(dialog, 3);
+	}
+}
+
+
 Scene* HelloWorld::createScene()
 {
 	// 'scene' is an autorelease object
@@ -147,32 +292,28 @@ bool HelloWorld::init()
 	labelOtherPt->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + bestScoreOffsetY + bestScoreOffsetY));
 	addChild(labelOtherPt, 2, eChild_OtherPoint);
 
-	//添加底图
-	for (int i = 0; i < 16; i++)
-	{
-		auto x = i / 4;
-		auto y = i % 4;
-		auto sprite = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle.png"));
-		//sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
-		sprite->setScale(m_nCardLength / sprite->getTextureRect().size.width, m_nCardLength / sprite->getTextureRect().size.height);
-		sprite->setColor(Color3B(204,192,178));
-		sprite->setAnchorPoint(cocos2d::Point(0, 0));
-		sprite->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX, x*m_nRectLength + m_nOffsetY));
-		addChild(sprite,1);
-
-// 		auto label = LabelTTF::create("", "Arial", m_nCardLength / 2);
-// 		char temp[20];
-// 		sprintf(temp, "%d", i);
-// 		label->setString(temp);
-// 		label->setColor(Color3B::BLUE);
-// 		label->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX + m_nCardLength / 2, x*m_nRectLength + m_nOffsetY + m_nCardLength / 2));
-// 		addChild(label);
-	}
+	auto cardRegion = CardRegion::create(m_nCardLength);
+	addChild(cardRegion, 2,eChild_CardRegion);
+	cardRegion->setAnchorPoint(Point(0, 0));
+	cardRegion->setPosition(Point(m_nOffsetX, m_nOffsetY));
+// 	//添加底图
+// 	for (int i = 0; i < 16; i++)
+// 	{
+// 		auto x = i / 4;
+// 		auto y = i % 4;
+// 		auto sprite = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle.png"));
+// 		//sprite->setTextureRect(cocos2d::Rect(0, 0, m_nCardLength, m_nCardLength));
+// 		sprite->setScale(m_nCardLength / sprite->getTextureRect().size.width, m_nCardLength / sprite->getTextureRect().size.height);
+// 		sprite->setColor(Color3B(204,192,178));
+// 		sprite->setAnchorPoint(cocos2d::Point(0, 0));
+// 		sprite->setPosition(cocos2d::Point(y*m_nRectLength + m_nOffsetX, x*m_nRectLength + m_nOffsetY));
+// 		addChild(sprite,1);
+// 	}
 
 
 	//初始化2个卡片
-  	AddNewCard();
- 	AddNewCard();
+  	//AddNewCard();
+ 	//AddNewCard();
 
 // 	auto x = 0, y = 2;
 // 	Card* card = Card::create(4, m_nCardLength);

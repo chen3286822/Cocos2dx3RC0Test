@@ -20,6 +20,27 @@ struct MoveCard
 	}
 };
 
+class CardRegion : public cocos2d::Node
+{
+public:
+	static CardRegion* create(int cardLength);
+	virtual bool init(int cardLength);
+
+	void AddCard();
+
+private:
+	void CheckFailure();
+
+	MoveCard m_iCardPark[4][4];
+
+	int  m_nBorder{ 10 };		//卡片间距
+	int  m_nShorter;			//屏幕较短的一边
+	int  m_nCardLength;	//卡片边长
+	int  m_nRectLength;	//卡片+间距长
+	int  m_nOffsetX;
+	int  m_nOffsetY;
+};
+
 class HelloWorld : public cocos2d::LayerColor
 {
 public:
@@ -29,6 +50,13 @@ public:
 		eChild_Point,
 		eChild_HighPoint,
 		eChild_OtherPoint,
+		eChild_CardRegion,
+	};
+
+	enum eMode
+	{
+		eMode_Single,
+		eMode_Bluetooth,
 	};
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene();
@@ -52,6 +80,12 @@ public:
 	void Restart(cocos2d::Ref* pSender);
 
 	void AddOtherPoint(int pt);
+	void SetGameMode(eMode mode){ m_eGameMode = mode; }
+	eMode GetGameMode(){ return m_eGameMode; }
+	void SetPoint(int pt){ m_nPoint = pt; }
+	int GetPoint(){ return m_nPoint; }
+	void SetHighPoint(int pt){ m_nHighScore = pt; }
+	int GetHighPoint(){ return m_nHighScore; }
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
@@ -61,7 +95,7 @@ private:
 	void RemoveMergedCardAndDoubleNum(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
 	void MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
 	void AddPoint(int pt);
-	void CheckFailure();
+	
 
 	MoveCard m_iCardPark[4][4];
 	int m_nHighScore;				//历史最高得分
@@ -77,6 +111,8 @@ private:
 
 	cocos2d::Point m_iStartPt;			//记录每次开始触摸的开始点坐标，用于判断滑动方向
 	bool m_bMoving{ false };		//判断卡片是否在移动中，用于决定是否接受触摸操作
+
+	eMode m_eGameMode{eMode_Single};			//游戏模式
 };
 
 #endif // __HELLOWORLD_SCENE_H__
