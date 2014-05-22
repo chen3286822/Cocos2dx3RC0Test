@@ -27,9 +27,13 @@ public:
 	virtual bool init(int cardLength);
 
 	void AddCard();
-
+	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
+	Card* FindCard(int x, int y);
 private:
 	void CheckFailure();
+	void MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
+	void RemoveMergedCardAndDoubleNum(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
+
 
 	MoveCard m_iCardPark[4][4];
 
@@ -59,7 +63,7 @@ public:
 		eMode_Bluetooth,
 	};
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
-    static cocos2d::Scene* createScene();
+    static cocos2d::Scene* createScene(eMode mode);
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();  
@@ -74,11 +78,10 @@ public:
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
-
-	void AddNewCard();
-	Card* FindCard(int x,int y);
+	
 	void Restart(cocos2d::Ref* pSender);
 
+	void AddPoint(int pt);
 	void AddOtherPoint(int pt);
 	void SetGameMode(eMode mode){ m_eGameMode = mode; }
 	eMode GetGameMode(){ return m_eGameMode; }
@@ -92,12 +95,8 @@ public:
 
 private:
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
-	void RemoveMergedCardAndDoubleNum(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
-	void MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
-	void AddPoint(int pt);
 	
-
-	MoveCard m_iCardPark[4][4];
+	CardRegion* m_pCardRegion{ nullptr };
 	int m_nHighScore;				//历史最高得分
 	int m_nPoint{ 0 };				//得分
 

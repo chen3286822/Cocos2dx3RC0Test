@@ -50,7 +50,7 @@ bool MainTitle::init()
 
 void MainTitle::SingleMode(cocos2d::Ref* pSender)
 {
-	Director::getInstance()->replaceScene(HelloWorld::createScene());
+	Director::getInstance()->replaceScene(HelloWorld::createScene(HelloWorld::eMode_Single));
 }
 
 void MainTitle::BluetoothMode(cocos2d::Ref* pSender)

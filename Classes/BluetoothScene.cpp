@@ -143,7 +143,7 @@ void Bluetooth::update(float fDelta)
 		unity::Log(TAG,"go to the game scene!");
 #endif
 		//start game
-		Director::getInstance()->replaceScene(HelloWorld::createScene());
+		Director::getInstance()->replaceScene(HelloWorld::createScene(HelloWorld::eMode_Bluetooth));
 
 		unscheduleUpdate();
 		return;
