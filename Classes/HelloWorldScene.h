@@ -66,7 +66,7 @@ public:
     static cocos2d::Scene* createScene(eMode mode);
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
-    virtual bool init();  
+	virtual bool init(eMode mode);
     
     // a selector callback
     //void menuCloseCallback(cocos2d::Ref* pSender);
@@ -91,7 +91,7 @@ public:
 	int GetHighPoint(){ return m_nHighScore; }
     
     // implement the "static create()" method manually
-    CREATE_FUNC(HelloWorld);
+	static HelloWorld* create(eMode mode);
 
 private:
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
@@ -100,13 +100,17 @@ private:
 	int m_nHighScore;				//历史最高得分
 	int m_nPoint{ 0 };				//得分
 
-	//一些卡片相关的变量
+	//一些控制布局的变量
+	int  m_nCardRegionOffset{ 2 };	//卡片区域到边界的偏移
 	int  m_nBorder{ 10 };		//卡片间距
+	int  m_nStatusHeight{ 50 };	//状态栏的高度
 	int  m_nShorter;			//屏幕较短的一边
+	int  m_nLonger;			//屏幕较长的一边
 	int  m_nCardLength;	//卡片边长
 	int  m_nRectLength;	//卡片+间距长
 	int  m_nOffsetX;			
 	int  m_nOffsetY;			
+	int  m_nOtherY;		//对方卡片区域的起始y坐标
 
 	cocos2d::Point m_iStartPt;			//记录每次开始触摸的开始点坐标，用于判断滑动方向
 	bool m_bMoving{ false };		//判断卡片是否在移动中，用于决定是否接受触摸操作
