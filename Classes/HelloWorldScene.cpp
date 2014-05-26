@@ -33,7 +33,7 @@ bool CardRegion::init(int cardLength)
 	spriteboard->setScale((m_nShorter - 4) / spriteboard->getTextureRect().size.width, (m_nShorter - 4) / spriteboard->getTextureRect().size.height);
 	spriteboard->setColor(Color3B(187, 173, 160));
 	spriteboard->setAnchorPoint(cocos2d::Point(0, 0));
-	spriteboard->setPosition(cocos2d::Point(2 - m_nBorder, -m_nBorder));
+	spriteboard->setPosition(cocos2d::Point(0, -m_nBorder));
 	addChild(spriteboard, 0);
 
 	//Ìí¼Óµ×Í¼
@@ -46,7 +46,7 @@ bool CardRegion::init(int cardLength)
 		sprite->setScale(m_nCardLength / sprite->getTextureRect().size.width, m_nCardLength / sprite->getTextureRect().size.height);
 		sprite->setColor(Color3B(204, 192, 178));
 		sprite->setAnchorPoint(cocos2d::Point(0, 0));
-		sprite->setPosition(cocos2d::Point(y*m_nRectLength, x*m_nRectLength));
+		sprite->setPosition(cocos2d::Point(m_nBorder + y*m_nRectLength, x*m_nRectLength));
 		addChild(sprite, 1);	
 	}
 
@@ -97,7 +97,7 @@ void CardRegion::AddCard()
 			int y = newCard % 4;
 			Card* card = Card::create(is2 ? 2 : 4, m_nCardLength);
 			addChild(card, 2);
-			card->setPosition(cocos2d::Point(y*(m_nBorder + m_nCardLength) , x*(m_nBorder + m_nCardLength)));
+			card->setPosition(cocos2d::Point(m_nBorder + y*(m_nBorder + m_nCardLength), x*(m_nBorder + m_nCardLength)));
 			card->GetPos().x = x;
 			card->GetPos().y = y;
 			m_iCardPark[x][y].m_pCard = card;
@@ -338,7 +338,7 @@ void CardRegion::MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir)
 		if ((int)moveCard.m_iMovePos.x == (int)moveCard.m_pCard->GetPos().x && (int)moveCard.m_iMovePos.y == (int)moveCard.m_pCard->GetPos().y)
 			return;
 		auto doneAction = CallFunc::create(CC_CALLBACK_0(CardRegion::RemoveMergedCardAndDoubleNum, this, x, y, dir));
-		auto moveAction = MoveTo::create(0.15f, cocos2d::Point(m_nRectLength*moveCard.m_iMovePos.y, m_nRectLength*moveCard.m_iMovePos.x));
+		auto moveAction = MoveTo::create(0.15f, cocos2d::Point(m_nBorder + m_nRectLength*moveCard.m_iMovePos.y, m_nRectLength*moveCard.m_iMovePos.x));
 		auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
 		moveCard.m_pCard->runAction(sequenceAction);
 		moveCard.m_bMoving = true;
