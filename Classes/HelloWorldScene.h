@@ -111,6 +111,7 @@ private:
 	int  m_nOffsetX;			
 	int  m_nOffsetY;			
 	int  m_nOtherY;		//对方卡片区域的起始y坐标
+	float m_fScale;		//卡片区域的缩放
 
 	cocos2d::Point m_iStartPt;			//记录每次开始触摸的开始点坐标，用于判断滑动方向
 	bool m_bMoving{ false };		//判断卡片是否在移动中，用于决定是否接受触摸操作

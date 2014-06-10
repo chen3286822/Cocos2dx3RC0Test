@@ -516,17 +516,22 @@ bool HelloWorld::init(eMode mode)
 	Point origin = Director::getInstance()->getVisibleOrigin();
 	m_nShorter = std::min(visibleSize.width, visibleSize.height);
 	m_nLonger = std::max(visibleSize.width, visibleSize.height);
-	m_nCardLength = (m_nShorter - m_nBorder * 5 - m_nCardRegionOffset*2) / 4;
+	m_nCardLength = (m_nShorter - m_nBorder * 5 - m_nCardRegionOffset * 2) / 4;
 	m_nRectLength = m_nBorder + m_nCardLength;
-	m_nOffsetX = m_nCardRegionOffset + origin.x;
+	
+	
 	if (m_eGameMode == eMode_Single)
 	{
+		m_fScale = 1.0f;
+		m_nOffsetX = m_nCardRegionOffset + origin.x;
 		m_nOffsetY = (m_nLonger - m_nShorter) / 2 + origin.y;
+		
 	}
 	else if (m_eGameMode == eMode_Bluetooth)
 	{
+		m_fScale = 0.8f;
 		int nWidth = (m_nLonger - m_nStatusHeight) / 2;
-
+		m_nOffsetX = m_nCardRegionOffset + origin.x;
 		m_nOffsetY = m_nCardRegionOffset + origin.y;
 		m_nOtherY = m_nOffsetY + m_nShorter;
 	}
@@ -623,6 +628,7 @@ bool HelloWorld::init(eMode mode)
 	addChild(m_pCardRegion, 2, eChild_CardRegion);
 	m_pCardRegion->setAnchorPoint(Point(0, 0));
 	m_pCardRegion->setPosition(Point(m_nOffsetX, m_nOffsetY));
+	m_pCardRegion->setScale(m_fScale);
 	return true;
 }
 
@@ -750,8 +756,8 @@ void HelloWorld::AddPoint(int pt)
 		auto sequenceAction = Sequence::create(zoomAction1, zoomAction2, NULL);
 		label->runAction(sequenceAction);
 
-		if (m_eGameMode == eMode_Bluetooth)
-			g_Transform.Send_Point(m_nPoint);
+		//if (m_eGameMode == eMode_Bluetooth)
+			//g_Transform.Send_Point(m_nPoint);
 	}
 }
 

@@ -31,7 +31,7 @@ void Dialog::onEnter()
 
 	this->addChild(m_pLayout);
 	Size rootSize = m_pLayout->getSize();
-	m_pLayout->setPosition(Point((visibleSize.width-rootSize.width)/2,(visibleSize.height-rootSize.height)/2));
+	m_pLayout->setPosition(Point((visibleSize.width - rootSize.width) / 2 + origin.x, (visibleSize.height - rootSize.height) / 2 + origin.y));
 
 	m_pButton = static_cast<Button*>(Helper::seekWidgetByName(m_pLayout, "OKButton"));
 	m_pButton->addTouchEventListener(this, toucheventselector(Dialog::touchEvent));
