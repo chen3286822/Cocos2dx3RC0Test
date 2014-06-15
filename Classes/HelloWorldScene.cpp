@@ -7,10 +7,10 @@
 
 USING_NS_CC;
 
-CardRegion* CardRegion::create(int cardLength)
+CardRegion* CardRegion::create(int cardLength, bool bOther)
 {
 	CardRegion* cardRegion = new CardRegion();
-	if (cardRegion && cardRegion->init(cardLength))
+	if (cardRegion && cardRegion->init(cardLength,bOther))
 	{
 		cardRegion->autorelease();
 		return cardRegion;
@@ -20,8 +20,10 @@ CardRegion* CardRegion::create(int cardLength)
 	return nullptr;
 }
 
-bool CardRegion::init(int cardLength)
+bool CardRegion::init(int cardLength, bool bOther)
 {
+	m_bOther = bOther;
+
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 	m_nCardLength = cardLength;
@@ -33,7 +35,7 @@ bool CardRegion::init(int cardLength)
 	spriteboard->setScale((m_nShorter - 4) / spriteboard->getTextureRect().size.width, (m_nShorter - 4) / spriteboard->getTextureRect().size.height);
 	spriteboard->setColor(Color3B(187, 173, 160));
 	spriteboard->setAnchorPoint(cocos2d::Point(0, 0));
-	spriteboard->setPosition(cocos2d::Point(0, -m_nBorder));
+	spriteboard->setPosition(cocos2d::Point(0, 0));
 	addChild(spriteboard, 0);
 
 	//Ìí¼Óµ×Í¼
@@ -46,12 +48,15 @@ bool CardRegion::init(int cardLength)
 		sprite->setScale(m_nCardLength / sprite->getTextureRect().size.width, m_nCardLength / sprite->getTextureRect().size.height);
 		sprite->setColor(Color3B(204, 192, 178));
 		sprite->setAnchorPoint(cocos2d::Point(0, 0));
-		sprite->setPosition(cocos2d::Point(m_nBorder + y*m_nRectLength, x*m_nRectLength));
+		sprite->setPosition(cocos2d::Point(m_nBorder + y*m_nRectLength, x*m_nRectLength + m_nBorder));
 		addChild(sprite, 1);	
 	}
 
-	AddCard();
-	AddCard();
+	if (m_bOther)
+	{
+		AddCard();
+		AddCard();
+	}
 
 	return true;
 }
@@ -97,7 +102,7 @@ void CardRegion::AddCard()
 			int y = newCard % 4;
 			Card* card = Card::create(is2 ? 2 : 4, m_nCardLength);
 			addChild(card, 2);
-			card->setPosition(cocos2d::Point(m_nBorder + y*(m_nBorder + m_nCardLength), x*(m_nBorder + m_nCardLength)));
+			card->setPosition(cocos2d::Point(m_nBorder + y*(m_nBorder + m_nCardLength), x*(m_nBorder + m_nCardLength) + m_nBorder));
 			card->GetPos().x = x;
 			card->GetPos().y = y;
 			m_iCardPark[x][y].m_pCard = card;
@@ -338,7 +343,7 @@ void CardRegion::MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir)
 		if ((int)moveCard.m_iMovePos.x == (int)moveCard.m_pCard->GetPos().x && (int)moveCard.m_iMovePos.y == (int)moveCard.m_pCard->GetPos().y)
 			return;
 		auto doneAction = CallFunc::create(CC_CALLBACK_0(CardRegion::RemoveMergedCardAndDoubleNum, this, x, y, dir));
-		auto moveAction = MoveTo::create(0.15f, cocos2d::Point(m_nBorder + m_nRectLength*moveCard.m_iMovePos.y, m_nRectLength*moveCard.m_iMovePos.x));
+		auto moveAction = MoveTo::create(0.15f, cocos2d::Point(m_nBorder + m_nRectLength*moveCard.m_iMovePos.y, m_nRectLength*moveCard.m_iMovePos.x + m_nBorder));
 		auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
 		moveCard.m_pCard->runAction(sequenceAction);
 		moveCard.m_bMoving = true;
@@ -517,9 +522,10 @@ bool HelloWorld::init(eMode mode)
 	m_nShorter = std::min(visibleSize.width, visibleSize.height);
 	m_nLonger = std::max(visibleSize.width, visibleSize.height);
 	m_nCardLength = (m_nShorter - m_nBorder * 5 - m_nCardRegionOffset * 2) / 4;
-	m_nRectLength = m_nBorder + m_nCardLength;
+	m_nRectLength = m_nBorder*5 + m_nCardLength*4;
 	
 	
+	int startX = 0, startY = 0;
 	if (m_eGameMode == eMode_Single)
 	{
 		m_fScale = 1.0f;
@@ -529,11 +535,10 @@ bool HelloWorld::init(eMode mode)
 	}
 	else if (m_eGameMode == eMode_Bluetooth)
 	{
-		m_fScale = 0.8f;
-		int nWidth = (m_nLonger - m_nStatusHeight) / 2;
-		m_nOffsetX = m_nCardRegionOffset + origin.x;
+		int nWidth = (m_nLonger - m_nStatusHeight - 2 * m_nCardRegionOffset) / 2;
+		m_fScale = (float)nWidth/(float)m_nRectLength;
+		m_nOffsetX = origin.x + (visibleSize.width - m_nRectLength*m_fScale)/2;
 		m_nOffsetY = m_nCardRegionOffset + origin.y;
-		m_nOtherY = m_nOffsetY + m_nShorter;
 	}
 
 	/////////////////////////////
@@ -542,15 +547,16 @@ bool HelloWorld::init(eMode mode)
 	Director::getInstance()->getTextureCache()->addImage("roundedrectangleboard.png");
 
 
-
-	if (m_eGameMode == eMode_Single)
-	{
+	startX = m_nOffsetX;
+	startY = m_nOffsetY + m_nRectLength*m_fScale + m_nBorder;
+// 	if (m_eGameMode == eMode_Single)
+// 	{
 		//new game
 		auto spriteNewGame = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
-		spriteNewGame->setScale(m_nCardLength * 1.2 / spriteNewGame->getTextureRect().size.width, m_nCardLength / (2.5 * spriteNewGame->getTextureRect().size.height));
+		spriteNewGame->setScale(1.2f, 1);
 		spriteNewGame->setColor(Color3B(143, 122, 102));
 		spriteNewGame->setAnchorPoint(cocos2d::Point(1, 0));
-		spriteNewGame->setPosition(cocos2d::Point(m_nOffsetX + 4 * m_nRectLength - m_nBorder, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
+		spriteNewGame->setPosition(cocos2d::Point(origin.x + visibleSize.width - m_nCardRegionOffset, startY));
 		addChild(spriteNewGame, 1);
 
 		auto labelRestart = LabelTTF::create("New Game", unity::GetDefaultFontType(), 20);
@@ -562,20 +568,20 @@ bool HelloWorld::init(eMode mode)
 		auto menu = Menu::create(restartItem, NULL);
 		menu->setPosition(Point::ZERO);
 		this->addChild(menu, 2);
-	}
+	//}
 
 
 	//score
 	auto spriteScore = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
-	spriteScore->setScale(m_nCardLength / spriteScore->getTextureRect().size.width, m_nCardLength / (2 * spriteScore->getTextureRect().size.height));
+	spriteScore->setScale(1.2f, 1);
 	spriteScore->setColor(Color3B(187, 173, 160));
 	spriteScore->setAnchorPoint(cocos2d::Point(0, 0));
-	spriteScore->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder));
+	spriteScore->setPosition(cocos2d::Point(startX, startY));
 	addChild(spriteScore, 1);
 
-	auto label = LabelTTF::create("SCORE", unity::GetDefaultFontType(), m_nCardLength / 6);
+	auto label = LabelTTF::create("SCORE", unity::GetDefaultFontType(), 18);
 	label->setColor(Color3B(238, 228, 218));
-	label->setPosition(cocos2d::Point(m_nOffsetX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteScore->getTextureRect().size.height*spriteScore->getScaleY() * 3 / 4));
+	label->setPosition(cocos2d::Point(startX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, startY + spriteScore->getTextureRect().size.height*spriteScore->getScaleY() * 3 / 4));
 	addChild(label, 2);
 
 	auto labelPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
@@ -584,23 +590,23 @@ bool HelloWorld::init(eMode mode)
 	labelPt->setString(temp);
 	labelPt->setColor(Color3B::WHITE);
 	labelPt->setAnchorPoint(cocos2d::Point(0.5, 0));
-	labelPt->setPosition(cocos2d::Point(m_nOffsetX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder));
+	labelPt->setPosition(cocos2d::Point(startX + spriteScore->getTextureRect().size.width*spriteScore->getScaleX() / 2, startY));
 	addChild(labelPt, 2, eChild_Point);
 
 	if (m_eGameMode == eMode_Single)
 	{
 		//best
-		auto bestScoreOffsetY = spriteScore->getTextureRect().size.height * spriteScore->getScaleY() + 5;
+		startY += (spriteScore->getTextureRect().size.height * spriteScore->getScaleY() + 5);
 		auto spriteBest = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
-		spriteBest->setScale(m_nCardLength / spriteBest->getTextureRect().size.width, m_nCardLength / (2 * spriteBest->getTextureRect().size.height));
+		spriteBest->setScale(1.2f, 1);
 		spriteBest->setColor(Color3B(187, 173, 160));
 		spriteBest->setAnchorPoint(cocos2d::Point(0, 0));
-		spriteBest->setPosition(cocos2d::Point(m_nOffsetX, m_nOffsetY + 4 * m_nRectLength + m_nBorder + bestScoreOffsetY));
+		spriteBest->setPosition(cocos2d::Point(startX, startY));
 		addChild(spriteBest, 1);
 
-		label = LabelTTF::create("BEST", unity::GetDefaultFontType(), m_nCardLength / 6);
+		label = LabelTTF::create("BEST", unity::GetDefaultFontType(), 18);
 		label->setColor(Color3B(238, 228, 218));
-		label->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + spriteBest->getTextureRect().size.height*spriteBest->getScaleY() * 3 / 4 + bestScoreOffsetY));
+		label->setPosition(cocos2d::Point(startX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, startY + spriteBest->getTextureRect().size.height*spriteBest->getScaleY() * 3 / 4));
 		addChild(label, 2);
 
 		auto labelHighPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
@@ -608,27 +614,49 @@ bool HelloWorld::init(eMode mode)
 		labelHighPt->setString(temp);
 		labelHighPt->setColor(Color3B::WHITE);
 		labelHighPt->setAnchorPoint(cocos2d::Point(0.5, 0));
-		labelHighPt->setPosition(cocos2d::Point(m_nOffsetX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, 4 * m_nRectLength + m_nOffsetY + m_nBorder + bestScoreOffsetY));
+		labelHighPt->setPosition(cocos2d::Point(startX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, startY));
 		addChild(labelHighPt, 2, eChild_HighPoint);
 	}
 
 	if (m_eGameMode == eMode_Bluetooth)
 	{
 		//other point
-		auto labelOtherPt = LabelTTF::create("OTHER SCORE: 0", unity::GetDefaultFontType(), m_nCardLength / 6);
-		labelOtherPt->setColor(Color3B::BLUE);
-		labelOtherPt->setAnchorPoint(Point(0, 0.5));
-		labelOtherPt->setPosition(cocos2d::Point(m_nOffsetX, 4 * m_nRectLength + m_nOffsetY + m_nBorder + (spriteScore->getTextureRect().size.height * spriteScore->getScaleY() + 5) * 2));
+		startX += m_nRectLength*m_fScale;
+		auto spriteOtherScore = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
+		spriteOtherScore->setScale(1.2f, 1);
+		spriteOtherScore->setColor(Color3B(187, 173, 160));
+		spriteOtherScore->setAnchorPoint(cocos2d::Point(1, 0));
+		spriteOtherScore->setPosition(cocos2d::Point(startX, startY));
+		addChild(spriteOtherScore, 1);
+
+		auto labelOtherScore = LabelTTF::create("Other SCORE", unity::GetDefaultFontType(), 18);
+		labelOtherScore->setColor(Color3B(238, 228, 218));
+		labelOtherScore->setPosition(cocos2d::Point(startX - spriteOtherScore->getTextureRect().size.width*spriteOtherScore->getScaleX() / 2, startY + spriteOtherScore->getTextureRect().size.height*spriteOtherScore->getScaleY() * 3 / 4));
+		addChild(labelOtherScore, 2);
+
+		auto labelOtherPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 6);
+		labelOtherPt->setColor(Color3B::WHITE);
+		labelOtherPt->setAnchorPoint(Point(0.5, 0));
+		labelOtherPt->setPosition(cocos2d::Point(startX - spriteOtherScore->getTextureRect().size.width*spriteOtherScore->getScaleX() / 2, startY));
 		addChild(labelOtherPt, 2, eChild_OtherPoint);
 	}
 
-
 	//card region
-	m_pCardRegion = CardRegion::create(m_nCardLength);
+	m_pCardRegion = CardRegion::create(m_nCardLength,false);
 	addChild(m_pCardRegion, 2, eChild_CardRegion);
 	m_pCardRegion->setAnchorPoint(Point(0, 0));
 	m_pCardRegion->setPosition(Point(m_nOffsetX, m_nOffsetY));
 	m_pCardRegion->setScale(m_fScale);
+
+	if (m_eGameMode == eMode_Bluetooth)
+	{
+		//other card region
+		m_pOtherCardRegion = CardRegion::create(m_nCardLength,true);
+		addChild(m_pOtherCardRegion, 2, eChild_OtherCardRegion);
+		m_pOtherCardRegion->setAnchorPoint(Point(0, 0));
+		m_pOtherCardRegion->setPosition(Point(m_nOffsetX, m_nOffsetY + m_nStatusHeight + m_nRectLength*m_fScale));
+		m_pOtherCardRegion->setScale(m_fScale);
+	}
 	return true;
 }
 
@@ -731,7 +759,7 @@ void HelloWorld::AddOtherPoint(int pt)
 	if (label)
 	{
 		char temp[20];
-		sprintf(temp, "OTHER SCORE: %d", pt);
+		sprintf(temp, "%d", pt);
 		label->setString(temp);
 	}
 }

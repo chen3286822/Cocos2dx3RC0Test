@@ -23,12 +23,14 @@ struct MoveCard
 class CardRegion : public cocos2d::Node
 {
 public:
-	static CardRegion* create(int cardLength);
-	virtual bool init(int cardLength);
+	static CardRegion* create(int cardLength,bool bOther);
+	virtual bool init(int cardLength, bool bOther);
 
 	void AddCard();
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
 	Card* FindCard(int x, int y);
+	
+	bool& GetOther(){ return m_bOther; }
 private:
 	void CheckFailure();
 	void MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir);
@@ -43,6 +45,8 @@ private:
 	int  m_nRectLength;	//卡片+间距长
 	int  m_nOffsetX;
 	int  m_nOffsetY;
+
+	bool m_bOther{ false };		//是否代表对方的卡片区域
 };
 
 class HelloWorld : public cocos2d::LayerColor
@@ -55,6 +59,7 @@ public:
 		eChild_HighPoint,
 		eChild_OtherPoint,
 		eChild_CardRegion,
+		eChild_OtherCardRegion,
 	};
 
 	enum eMode
@@ -97,20 +102,20 @@ private:
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
 	
 	CardRegion* m_pCardRegion{ nullptr };
+	CardRegion* m_pOtherCardRegion{ nullptr };
 	int m_nHighScore;				//历史最高得分
 	int m_nPoint{ 0 };				//得分
 
 	//一些控制布局的变量
 	int  m_nCardRegionOffset{ 2 };	//卡片区域到边界的偏移
 	int  m_nBorder{ 10 };		//卡片间距
-	int  m_nStatusHeight{ 50 };	//状态栏的高度
+	int  m_nStatusHeight{ 70 };	//状态栏的高度
 	int  m_nShorter;			//屏幕较短的一边
 	int  m_nLonger;			//屏幕较长的一边
 	int  m_nCardLength;	//卡片边长
-	int  m_nRectLength;	//卡片+间距长
+	int  m_nRectLength;	//卡片区域边长
 	int  m_nOffsetX;			
 	int  m_nOffsetY;			
-	int  m_nOtherY;		//对方卡片区域的起始y坐标
 	float m_fScale;		//卡片区域的缩放
 
 	cocos2d::Point m_iStartPt;			//记录每次开始触摸的开始点坐标，用于判断滑动方向
