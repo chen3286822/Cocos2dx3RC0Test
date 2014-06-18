@@ -52,7 +52,7 @@ bool CardRegion::init(int cardLength, bool bOther)
 		addChild(sprite, 1);	
 	}
 
-	if (m_bOther)
+	if (!m_bOther)
 	{
 		AddCard();
 		AddCard();
@@ -489,6 +489,14 @@ Scene* HelloWorld::createScene(eMode mode)
 	return scene;
 }
 
+HelloWorld::~HelloWorld()
+{
+	m_pKeyboardListener->release();
+	_eventDispatcher->removeEventListener(m_pKeyboardListener);
+	m_pTouchListener->release();
+	_eventDispatcher->removeEventListener(m_pTouchListener);
+}
+
 // on "init" you need to initialize your instance
 bool HelloWorld::init(eMode mode)
 {
@@ -500,20 +508,30 @@ bool HelloWorld::init(eMode mode)
 	}
 
 	m_eGameMode = mode;
+	m_bGetStartInformed = false;
+	m_dwStartTime = 0;
+	m_nStartSeconds = 0;
+	m_pKeyboardListener = nullptr;
+	m_pTouchListener = nullptr;
 
 	m_nHighScore = UserDefault::getInstance()->getIntegerForKey("Score", 19996);
 
-	auto listener = EventListenerKeyboard::create();
-	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+	m_pKeyboardListener = EventListenerKeyboard::create();
+	m_pKeyboardListener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
+	m_pKeyboardListener->retain();
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(m_pKeyboardListener, this);
 
 	// Register Touch Event
-	auto listener2 = EventListenerTouchOneByOne::create();
-	listener2->setSwallowTouches(true);
-	listener2->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
-	listener2->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
-	listener2->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2, this);
+	m_pTouchListener = EventListenerTouchOneByOne::create();
+	m_pTouchListener->setSwallowTouches(true);
+	m_pTouchListener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+	m_pTouchListener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
+	m_pTouchListener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+	//if not retain, the listener will be autoreleased in bluetooth mode, because it has not been added to the dispathcher yet
+	m_pTouchListener->retain();
+	if (m_eGameMode == eMode_Single)
+		_eventDispatcher->addEventListenerWithSceneGraphPriority(m_pTouchListener, this);
+
 
 	srand((unsigned int)time(NULL));
 
@@ -549,8 +567,8 @@ bool HelloWorld::init(eMode mode)
 
 	startX = m_nOffsetX;
 	startY = m_nOffsetY + m_nRectLength*m_fScale + m_nBorder;
-// 	if (m_eGameMode == eMode_Single)
-// 	{
+ 	if (m_eGameMode == eMode_Single)
+ 	{
 		//new game
 		auto spriteNewGame = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("roundedrectangle2.png"));
 		spriteNewGame->setScale(1.2f, 1);
@@ -568,7 +586,7 @@ bool HelloWorld::init(eMode mode)
 		auto menu = Menu::create(restartItem, NULL);
 		menu->setPosition(Point::ZERO);
 		this->addChild(menu, 2);
-	//}
+	}
 
 
 	//score
@@ -650,15 +668,71 @@ bool HelloWorld::init(eMode mode)
 
 	if (m_eGameMode == eMode_Bluetooth)
 	{
+		auto showLabel = LabelTTF::create("", unity::GetDefaultFontType(), 25);
+		showLabel->setAnchorPoint(Point(0.5, 1));
+		showLabel->setPosition(Point(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - 40));
+		addChild(showLabel, 3, eChild_ShowLabel);
+
 		//other card region
 		m_pOtherCardRegion = CardRegion::create(m_nCardLength,true);
 		addChild(m_pOtherCardRegion, 2, eChild_OtherCardRegion);
 		m_pOtherCardRegion->setAnchorPoint(Point(0, 0));
 		m_pOtherCardRegion->setPosition(Point(m_nOffsetX, m_nOffsetY + m_nStatusHeight + m_nRectLength*m_fScale));
 		m_pOtherCardRegion->setScale(m_fScale);
+
+		//add a update scheduler
+		unscheduleUpdate();
+		scheduleUpdate();
+		m_dwStartTime = unity::GetTickCountX();
 	}
 	return true;
 }
+
+void HelloWorld::update(float fDelta)
+{
+	if (m_bGetStartInformed && m_nStartSeconds >= 3)
+	{
+		//inform other player to start
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+
+		g_Transform.Send_Start();
+		unity::Log(TAG, "go to the game scene!");
+#endif
+		//touch control
+		if (m_pTouchListener)
+			_eventDispatcher->addEventListenerWithSceneGraphPriority(m_pTouchListener, this);
+
+		auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+		if (label)
+		{
+			label->setVisible(false);
+		}
+
+		unscheduleUpdate();
+		return;
+	}
+	unsigned long curTime = unity::GetTickCountX();
+	if (m_dwStartTime + 1000 <= curTime && m_nStartSeconds < 3)
+	{
+		m_dwStartTime = curTime;
+		auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
+		if (label)
+		{
+			//unity::Log("2048debug", "after %d the game will start", 3 - m_nStartSeconds);
+			label->setString(StringUtils::format("The game will start in %d...", 3 - m_nStartSeconds));
+		}
+		m_nStartSeconds++;
+		if (m_nStartSeconds >= 3)
+		{
+			//inform other player to start
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			unity::Log(TAG, "inform game start");
+			g_Transform.Send_Start();
+#endif
+		}
+	}
+}
+
 
 void HelloWorld::Restart(cocos2d::Ref* pSender)
 {

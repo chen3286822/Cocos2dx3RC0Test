@@ -36,9 +36,6 @@ bool Bluetooth::init()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	m_vDevices.clear();
-	m_bGetStartInformed = false;
-	m_dwStartTime = 0;
-	m_nStartSeconds = 0;
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
@@ -132,44 +129,6 @@ void Bluetooth::AddDevice(std::string name, std::string MAC)
 #endif
 }
 
-void Bluetooth::update(float fDelta)
-{
-	if (m_bGetStartInformed && m_nStartSeconds >= 3)
-	{
-		//inform other player to start
-#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-
-		g_Transform.Send_Start();
-		unity::Log(TAG,"go to the game scene!");
-#endif
-		//start game
-		Director::getInstance()->replaceScene(HelloWorld::createScene(HelloWorld::eMode_Bluetooth));
-
-		unscheduleUpdate();
-		return;
-	}
-	unsigned long curTime = unity::GetTickCountX();
-	if (m_dwStartTime + 1000 <= curTime && m_nStartSeconds < 3)
-	{
-		m_dwStartTime = curTime;
-		auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
-		if (label)
-		{
-			//unity::Log("2048debug", "after %d the game will start", 3 - m_nStartSeconds);
-			label->setString(StringUtils::format("The game will start in %d...", 3-m_nStartSeconds));
-		}
-		m_nStartSeconds++;
-		if (m_nStartSeconds >= 3)
-		{
-			//inform other player to start
-#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-			unity::Log(TAG,"inform game start");
-			g_Transform.Send_Start();
-#endif
-		}
-	}
-}
-
 void Bluetooth::CheckConnectionState(int state)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -191,11 +150,8 @@ void Bluetooth::CheckConnectionState(int state)
 									item->setVisible(false);
 								}
 							}
-							//add a update scheduler
-							unscheduleUpdate();
-							scheduleUpdate();
-							m_dwStartTime = unity::GetTickCountX();
-							unity::Log(TAG,"update scheduled! time is:%ld",m_dwStartTime);
+							//start game
+							Director::getInstance()->replaceScene(HelloWorld::createScene(HelloWorld::eMode_Bluetooth));
 	}
 		break;
 	case STATE_CONNECTING:

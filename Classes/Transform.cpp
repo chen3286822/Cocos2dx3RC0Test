@@ -79,7 +79,7 @@ void Transform::Send_Start()
 */
 void Transform::Msg_Start(const char* data)
 {
-	auto layer = dynamic_cast<Bluetooth*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(Bluetooth::eChild_BluetoothLayer));
+	auto layer = dynamic_cast<HelloWorld*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
 	if (layer)
 	{
 		layer->InformToStart();

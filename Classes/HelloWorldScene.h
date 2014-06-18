@@ -60,6 +60,7 @@ public:
 		eChild_OtherPoint,
 		eChild_CardRegion,
 		eChild_OtherCardRegion,
+		eChild_ShowLabel,
 	};
 
 	enum eMode
@@ -69,9 +70,10 @@ public:
 	};
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene(eMode mode);
-
+	~HelloWorld();
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init(eMode mode);
+	virtual void update(float fDelta);
     
     // a selector callback
     //void menuCloseCallback(cocos2d::Ref* pSender);
@@ -98,7 +100,11 @@ public:
     // implement the "static create()" method manually
 	static HelloWorld* create(eMode mode);
 
+	void InformToStart(){ m_bGetStartInformed = true; }
 private:
+	cocos2d::EventListenerKeyboard* m_pKeyboardListener{ nullptr };
+	cocos2d::EventListenerTouchOneByOne* m_pTouchListener{ nullptr };
+
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
 	
 	CardRegion* m_pCardRegion{ nullptr };
@@ -122,6 +128,9 @@ private:
 	bool m_bMoving{ false };		//判断卡片是否在移动中，用于决定是否接受触摸操作
 
 	eMode m_eGameMode{eMode_Single};			//游戏模式
+	unsigned long m_dwStartTime{ 0 };
+	int m_nStartSeconds{ 0 };
+	bool m_bGetStartInformed{ false };
 };
 
 #endif // __HELLOWORLD_SCENE_H__
