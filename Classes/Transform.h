@@ -36,9 +36,13 @@
 #define  Send_END()
 #endif
 
+#define GET_INT(data,index) unity::GetDataInt(data,index);
+
+
 #define MSG_START 1
 #define MSG_INIT_CARD 2
 #define MSG_POINT 3
+#define MSG_SCENE_INIT 4
 
 class Transform;
 typedef void(Transform::*MsgFunc)(const char*);
@@ -56,6 +60,9 @@ public:
 
 	void Send_Start();
 	void Msg_Start(const char* data);
+	void Send_Scene_Init();
+	void Msg_Scene_Init(const char* data);
+	void Send_Init_Card(int x1,int y1,int num1,int x2,int y2,int num2);
 	void Msg_Init_Card(const char* data);
 	void Send_Point(int pt);
 	void Msg_Point(const char* data);

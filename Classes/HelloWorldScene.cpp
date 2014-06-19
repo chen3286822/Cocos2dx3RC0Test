@@ -4,6 +4,7 @@
 #include "Unity.h"
 #include "Transform.h"
 #include "MainTitleScene.h"
+#include "GameData.h"
 
 USING_NS_CC;
 
@@ -23,6 +24,7 @@ CardRegion* CardRegion::create(int cardLength, bool bOther)
 bool CardRegion::init(int cardLength, bool bOther)
 {
 	m_bOther = bOther;
+	m_vInitCards.clear();
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
@@ -54,14 +56,36 @@ bool CardRegion::init(int cardLength, bool bOther)
 
 	if (!m_bOther)
 	{
-		AddCard();
-		AddCard();
+		AddCard(true);
+		AddCard(true);
+	}
+	else
+	{
+		unscheduleUpdate();
+		scheduleUpdate();
 	}
 
 	return true;
 }
 
-void CardRegion::AddCard()
+void CardRegion::update(float fDelta)
+{
+	if (g_Gamedata.getSceneInit())
+	{
+		//send init card information
+		if (m_vInitCards.size() >= 2)
+		{
+			SimpleCard& card1 = m_vInitCards[0];
+			SimpleCard& card2 = m_vInitCards[1];
+			g_Transform.Send_Init_Card((int)card1.m_iPos.x,(int)card1.m_iPos.y,card1.m_nNum,(int)card2.m_iPos.x,(int)card2.m_iPos.y,card2.m_nNum);
+		}
+
+		g_Gamedata.setSceneInit(false);
+		unscheduleUpdate();
+	}
+}
+
+void CardRegion::AddCard(bool bInit)
 {
 	//计算剩余空卡
 	std::list<int> emptyCard;
@@ -107,7 +131,14 @@ void CardRegion::AddCard()
 			card->GetPos().y = y;
 			m_iCardPark[x][y].m_pCard = card;
 			m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
-			//m_lCards.push_back(card);
+			
+			if (bInit)
+			{
+				SimpleCard simpleCard;
+				simpleCard.m_iPos = card->GetPos();
+				simpleCard.m_nNum = card->getNum();
+				m_vInitCards.push_back(simpleCard);
+			}
 			break;
 		}
 		start++;
@@ -117,6 +148,21 @@ void CardRegion::AddCard()
 	//没有空位时才会检测
 	if (emptyCard.size() - 1 <= 0)
 		CheckFailure();
+}
+
+void CardRegion::AddCard(int x, int y, int num)
+{
+	if (x < 0 || x >= 4 || y < 0 || y >= 4)
+		return;
+	if (m_iCardPark[x][y].m_pCard)
+		return;
+	Card* card = Card::create(num, m_nCardLength);
+	addChild(card, 2);
+	card->setPosition(cocos2d::Point(m_nBorder + y*(m_nBorder + m_nCardLength), x*(m_nBorder + m_nCardLength) + m_nBorder));
+	card->GetPos().x = x;
+	card->GetPos().y = y;
+	m_iCardPark[x][y].m_pCard = card;
+	m_iCardPark[x][y].m_iMovePos = cocos2d::Point(card->GetPos());
 }
 
 void CardRegion::CheckFailure()
@@ -684,6 +730,13 @@ bool HelloWorld::init(eMode mode)
 		unscheduleUpdate();
 		scheduleUpdate();
 		m_dwStartTime = unity::GetTickCountX();
+
+		//inform game scene create finish
+#if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+
+		g_Transform.Send_Scene_Init();
+		unity::Log(TAG, "game scene init!");
+#endif
 	}
 	return true;
 }
@@ -858,8 +911,8 @@ void HelloWorld::AddPoint(int pt)
 		auto sequenceAction = Sequence::create(zoomAction1, zoomAction2, NULL);
 		label->runAction(sequenceAction);
 
-		//if (m_eGameMode == eMode_Bluetooth)
-			//g_Transform.Send_Point(m_nPoint);
+		if (m_eGameMode == eMode_Bluetooth)
+			g_Transform.Send_Point(m_nPoint);
 	}
 }
 

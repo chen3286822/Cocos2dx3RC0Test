@@ -20,13 +20,23 @@ struct MoveCard
 	}
 };
 
+struct SimpleCard
+{
+	cocos2d::Point m_iPos;
+	int m_nNum;
+};
+
 class CardRegion : public cocos2d::Node
 {
 public:
 	static CardRegion* create(int cardLength,bool bOther);
 	virtual bool init(int cardLength, bool bOther);
+	virtual void update(float fDelta);
 
-	void AddCard();
+	void AddCard(bool bInit=false);
+	void AddCard(int x,int y,int num);	//for other
+
+
 	void MoveAndMergeCard(cocos2d::EventKeyboard::KeyCode dir);
 	Card* FindCard(int x, int y);
 	
@@ -47,6 +57,7 @@ private:
 	int  m_nOffsetY;
 
 	bool m_bOther{ false };		//是否代表对方的卡片区域
+	std::vector<SimpleCard> m_vInitCards;
 };
 
 class HelloWorld : public cocos2d::LayerColor

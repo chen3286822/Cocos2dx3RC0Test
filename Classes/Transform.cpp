@@ -3,6 +3,7 @@
 #include "JNIFunc.h"
 #include "BluetoothScene.h"
 #include "HelloWorldScene.h"
+#include "GameData.h"
 #include <string>
 
 Transform g_Transform;
@@ -88,6 +89,38 @@ void Transform::Msg_Start(const char* data)
 }
 
 /*
+	通知对方自己的游戏场景创建完成，此后可以传输卡片位置等信息了
+*/
+void Transform::Send_Scene_Init()
+{
+	Send_Begin(MSG_SCENE_INIT);
+	Send_END();
+}
+
+/*
+	空，仅通过协议类型通知对方游戏场景创建完毕
+*/
+void Transform::Msg_Scene_Init(const char* data)
+{
+	g_Gamedata.setSceneInit(true);
+}
+
+/*
+	发送初始化的两张卡片数据给对方
+*/
+void Transform::Send_Init_Card(int x1, int y1, int num1, int x2, int y2, int num2)
+{
+	Send_Begin(MSG_INIT_CARD);
+	ADD_INT(x1);
+	ADD_INT(y1);
+	ADD_INT(num1);
+	ADD_INT(x2);
+	ADD_INT(y2);
+	ADD_INT(num2);
+	Send_END();
+}
+
+/*
 	int : 第一卡片的x坐标 
 	int : 第一卡片的y坐标
 	int : 第一卡片的值
@@ -97,7 +130,24 @@ void Transform::Msg_Start(const char* data)
 */
 void Transform::Msg_Init_Card(const char* data)
 {
-
+	int index = 0;
+	int x1 = GET_INT(data, index);
+	int y1 = GET_INT(data, index);
+	int num1 = GET_INT(data, index);
+	int x2 = GET_INT(data, index);
+	int y2 = GET_INT(data, index);
+	int num2 = GET_INT(data, index);
+	unity::Log(TAG, "(%d,%d) num:%d,  (%d,%d) num:%d",x1,y1,num1,x2,y2,num2);
+	auto layer = dynamic_cast<HelloWorld*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
+	if (layer)
+	{
+		auto region = dynamic_cast<CardRegion*>(layer->getChildByTag(HelloWorld::eChild_OtherCardRegion));
+		if (region)
+		{
+			region->AddCard(x1, y1, num1);
+			region->AddCard(x2, y2, num2);
+		}
+	}
 }
 
 /*
@@ -112,11 +162,8 @@ void Transform::Send_Point(int pt)
 
 void Transform::Msg_Point(const char* data)
 {
-	int ptLength = (int)(data[0] - '0');
-	CCLOG("data is : %s", data);
-	std::string ptStr = data;
-	ptStr = ptStr.substr(1, ptLength);
-	int point = atoi(ptStr.c_str());
+	int index = 0;
+	int point = GET_INT(data, index);
 	unity::Log(TAG, "point : %d", point);
 
 	auto layer = dynamic_cast<HelloWorld*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));

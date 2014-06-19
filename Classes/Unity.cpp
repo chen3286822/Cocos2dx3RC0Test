@@ -50,4 +50,14 @@ namespace unity
 		}
 		return digits;
 	}
+
+	int GetDataInt(const char* data, int& index)
+	{
+		int length = (int)(data[index] - '0');
+		index += 1;
+		std::string dataStr = data;
+		dataStr = dataStr.substr(index, length);
+		index += length;
+		return atoi(dataStr.c_str());
+	}
 }
