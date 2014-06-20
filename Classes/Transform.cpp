@@ -151,7 +151,7 @@ void Transform::Msg_Init_Card(const char* data)
 }
 
 /*
-	int : 分数
+	发送分数给对方
 */
 void Transform::Send_Point(int pt)
 {
@@ -160,6 +160,9 @@ void Transform::Send_Point(int pt)
 	Send_END();
 }
 
+/*
+	int : 分数
+*/
 void Transform::Msg_Point(const char* data)
 {
 	int index = 0;
@@ -170,5 +173,66 @@ void Transform::Msg_Point(const char* data)
 	if(layer)
 	{
 		layer->AddOtherPoint(point);
+	}
+}
+
+/*
+	发送卡片移动方向给对方
+*/
+void Transform::Send_Move(int dir)
+{
+	Send_Begin(MSG_MOVE);
+	ADD_INT(dir);
+	Send_END();
+}
+
+/*
+	int : 对方卡片区域移动方向
+*/
+void Transform::Msg_Move(const char* data)
+{
+	int index = 0;
+	int dir = GET_INT(data, index);
+
+	auto layer = dynamic_cast<HelloWorld*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
+	if (layer)
+	{
+		auto otherCardRegion = dynamic_cast<CardRegion*>(layer->getChildByTag(HelloWorld::eChild_OtherCardRegion));
+		if (otherCardRegion)
+			otherCardRegion->MoveAndMergeCard((cocos2d::EventKeyboard::KeyCode)dir);
+	}
+}
+
+/*
+	发送增加的卡片信息给对方
+*/
+void Transform::Send_Add_Card(int x, int y, int num)
+{
+	Send_Begin(MSG_ADD_CARD);
+	ADD_INT(x);
+	ADD_INT(y);
+	ADD_INT(num);
+	Send_END();
+}
+
+/*
+	int : 新增卡片的x坐标
+	int : 新增卡片的y坐标
+	int : 新增卡片的值
+*/
+void Transform::Msg_Add_Card(const char* data)
+{
+	int index = 0;
+	int x = GET_INT(data, index);
+	int y = GET_INT(data, index);
+	int num = GET_INT(data, index);
+	auto layer = dynamic_cast<HelloWorld*>(cocos2d::CCDirector::getInstance()->getRunningScene()->getChildByTag(HelloWorld::eChild_HelloWorldLayer));
+	if (layer)
+	{
+		auto region = dynamic_cast<CardRegion*>(layer->getChildByTag(HelloWorld::eChild_OtherCardRegion));
+		if (region)
+		{
+			region->AddCard(x, y, num);
+		}
 	}
 }

@@ -43,6 +43,8 @@
 #define MSG_INIT_CARD 2
 #define MSG_POINT 3
 #define MSG_SCENE_INIT 4
+#define MSG_MOVE 5
+#define MSG_ADD_CARD 6
 
 class Transform;
 typedef void(Transform::*MsgFunc)(const char*);
@@ -66,6 +68,10 @@ public:
 	void Msg_Init_Card(const char* data);
 	void Send_Point(int pt);
 	void Msg_Point(const char* data);
+	void Send_Move(int dir);
+	void Msg_Move(const char* data);
+	void Send_Add_Card(int x, int y, int num);
+	void Msg_Add_Card(const char* data);
 private:
 	char m_strMsg[MSG_LENGTH];
 	MFunc m_mFunc;

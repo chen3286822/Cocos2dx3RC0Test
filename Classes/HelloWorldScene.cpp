@@ -58,9 +58,7 @@ bool CardRegion::init(int cardLength, bool bOther)
 	{
 		AddCard(true);
 		AddCard(true);
-	}
-	else
-	{
+
 		unscheduleUpdate();
 		scheduleUpdate();
 	}
@@ -138,6 +136,11 @@ void CardRegion::AddCard(bool bInit)
 				simpleCard.m_iPos = card->GetPos();
 				simpleCard.m_nNum = card->getNum();
 				m_vInitCards.push_back(simpleCard);
+			}
+			else if (!m_bOther)
+			{
+				//send card info to other
+				g_Transform.Send_Add_Card((int)card->GetPos().x, (int)card->GetPos().y, card->getNum());
 			}
 			break;
 		}
@@ -226,6 +229,9 @@ void CardRegion::MoveAndMergeCard(EventKeyboard::KeyCode dir)
 			}
 		}
 	}
+
+	if (!m_bOther)
+		g_Transform.Send_Move((int)dir);
 
 	auto condition = [=](int Lformer1, int Lindex1, int Lformer2, int Lindex2) -> bool
 	{
@@ -478,7 +484,7 @@ void CardRegion::RemoveMergedCardAndDoubleNum(int x, int y, EventKeyboard::KeyCo
 				{
 					movedCard.m_pCard->setNum(movedCard.m_pCard->getNum() * 2, false);
 					auto helloWorld = dynamic_cast<HelloWorld*>(getParent());
-					if (helloWorld)
+					if (helloWorld && !m_bOther)
 						helloWorld->AddPoint(movedCard.m_pCard->getNum());
 				}
 
@@ -494,7 +500,8 @@ void CardRegion::RemoveMergedCardAndDoubleNum(int x, int y, EventKeyboard::KeyCo
 
 	}
 
-	AddCard();
+	if (!m_bOther)
+		AddCard();
 }
 
 Card* CardRegion::FindCard(int x, int y)
