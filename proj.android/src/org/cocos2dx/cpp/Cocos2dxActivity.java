@@ -249,6 +249,9 @@ public class Cocos2dxActivity extends NativeActivity{
 	
 	private void sendMsg(String message)
 	{
+		// Check if the connect service has been created
+		if(mConnecttService == null)
+			return;
         // Check that we're actually connected before trying anything
         if (mConnecttService.getState() != BluetoothConnectionService.STATE_CONNECTED) {
             Toast.makeText(this, "Not connect yet", Toast.LENGTH_SHORT).show();
@@ -265,6 +268,9 @@ public class Cocos2dxActivity extends NativeActivity{
 	
 	private void sendMsg(byte[] message)
 	{
+		// Check if the connect service has been created
+		if(mConnecttService == null)
+			return;
         // Check that we're actually connected before trying anything
         if (mConnecttService.getState() != BluetoothConnectionService.STATE_CONNECTED) {
             Toast.makeText(this, "Not connect yet", Toast.LENGTH_SHORT).show();

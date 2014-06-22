@@ -567,7 +567,7 @@ bool HelloWorld::init(eMode mode)
 	m_pKeyboardListener = nullptr;
 	m_pTouchListener = nullptr;
 
-	m_nHighScore = UserDefault::getInstance()->getIntegerForKey("Score", 19996);
+	m_nHighScore = UserDefault::getInstance()->getIntegerForKey("Score", 0);
 
 	m_pKeyboardListener = EventListenerKeyboard::create();
 	m_pKeyboardListener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
@@ -741,7 +741,7 @@ bool HelloWorld::init(eMode mode)
 		//inform game scene create finish
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 
-		g_Transform.Send_Scene_Init();
+		//g_Transform.Send_Scene_Init();
 		unity::Log(TAG, "game scene init!");
 #endif
 	}
@@ -787,7 +787,7 @@ void HelloWorld::update(float fDelta)
 			//inform other player to start
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 			unity::Log(TAG, "inform game start");
-			g_Transform.Send_Start();
+			//g_Transform.Send_Start();
 #endif
 		}
 	}

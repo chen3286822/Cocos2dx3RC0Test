@@ -97,17 +97,7 @@ void Bluetooth::StartGame(cocos2d::Ref* pSender)
 void Bluetooth::GetMessage(const char* data)
 {
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_ShowLabel));
-	if (label)
-	{
-		if(strcmp(data,"Start") == 0)
-		{	
-			m_bGetStartInformed = true;
-			unity::Log(TAG,"I was informed!");
-		}
-		else
-			label->setString(data);
-	}
+
 #endif
 }
 
