@@ -101,7 +101,7 @@ extern "C"
 
 	void Java_org_cocos2dx_cpp_JniHelper_exitApp(JNIEnv *env, jobject thiz)
 	{
-		CCDirector::getInstance()->end();
+		unity::CleanAndExit();
 	}
 
 	void Java_org_cocos2dx_cpp_JniHelper_stopBluetoothCheck(JNIEnv *env, jobject thiz)

@@ -199,20 +199,21 @@ void CardRegion::CheckFailure()
 		auto dialog = Dialog::create();
 		dialog->SetTitle("Game Over");
 		char temp[255];
-		if (helloWorld->GetPoint() > helloWorld->GetHighPoint())
+		if (unity::UserData::getInstance()->HasBreakRecord(helloWorld->GetPoint()))
 		{
 			dialog->setNewRecord(true);
 			sprintf(temp, "A new record!\nYou got %d points!", helloWorld->GetPoint());
-			helloWorld->SetHighPoint(helloWorld->GetPoint());
-			UserDefault::getInstance()->setIntegerForKey("Score", helloWorld->GetHighPoint());
+			//helloWorld->SetHighPoint(helloWorld->GetPoint());
+			//UserDefault::getInstance()->setIntegerForKey("Score", helloWorld->GetHighPoint());
+			dialog->AddButton("OK", CC_CALLBACK_1(HelloWorld::GoRank, dynamic_cast<HelloWorld*>(getParent())));
 		}
 		else
 		{
-			sprintf(temp, "You got %d points!\nBest record is %dpts.", helloWorld->GetPoint(), helloWorld->GetHighPoint());
+			sprintf(temp, "You got %d points!\nNext record is %dpts.", helloWorld->GetPoint(), helloWorld->GetHighPoint());
+			dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, dynamic_cast<HelloWorld*>(getParent())));
 		}
 
-		dialog->SetContent(temp);
-		dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, dynamic_cast<HelloWorld*>(getParent())));
+		dialog->SetContent(temp);	
 		helloWorld->addChild(dialog, 3);
 	}
 }
@@ -567,7 +568,7 @@ bool HelloWorld::init(eMode mode)
 	m_pKeyboardListener = nullptr;
 	m_pTouchListener = nullptr;
 
-	m_nHighScore = UserDefault::getInstance()->getIntegerForKey("Score", 0);
+	m_nHighScore = unity::UserData::getInstance()->GetCurrentHighScore(m_nPoint);
 
 	m_pKeyboardListener = EventListenerKeyboard::create();
 	m_pKeyboardListener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
@@ -656,7 +657,7 @@ bool HelloWorld::init(eMode mode)
 	addChild(label, 2);
 
 	auto labelPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
-	char temp[20];
+	char temp[50];
 	sprintf(temp, "%d", m_nPoint);
 	labelPt->setString(temp);
 	labelPt->setColor(Color3B::WHITE);
@@ -741,10 +742,18 @@ bool HelloWorld::init(eMode mode)
 		//inform game scene create finish
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 
-		//g_Transform.Send_Scene_Init();
+		g_Transform.Send_Scene_Init();
 		unity::Log(TAG, "game scene init!");
 #endif
 	}
+
+	auto dialog = Dialog::create();
+	dialog->SetTitle("Game Over");
+	dialog->setNewRecord(true);
+	sprintf(temp, "A new record!\nYou got %d points!", 3000);
+	dialog->AddButton("OK", CC_CALLBACK_1(HelloWorld::GoRank, this));
+	dialog->SetContent(temp);
+	addChild(dialog, 3);
 	return true;
 }
 
@@ -787,7 +796,7 @@ void HelloWorld::update(float fDelta)
 			//inform other player to start
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 			unity::Log(TAG, "inform game start");
-			//g_Transform.Send_Start();
+			g_Transform.Send_Start();
 #endif
 		}
 	}
@@ -800,6 +809,12 @@ void HelloWorld::Restart(cocos2d::Ref* pSender)
 		Director::getInstance()->replaceScene(HelloWorld::createScene(eMode_Single));
 	else if (m_eGameMode == eMode_Bluetooth)
 		Director::getInstance()->replaceScene(MainTitle::createScene());
+}
+
+void HelloWorld::GoRank(cocos2d::Ref* pSender)
+{
+	//ÅÅÐÐ°ñ³¡¾°
+	Director::getInstance()->replaceScene(MainTitle::createScene());
 }
 
 void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
@@ -818,7 +833,7 @@ void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
 		break;
 	case EventKeyboard::KeyCode::KEY_ESCAPE:
 	{
-											   Director::getInstance()->end();
+											   unity::CleanAndExit();
 	}
 		break;
 	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
@@ -920,6 +935,21 @@ void HelloWorld::AddPoint(int pt)
 
 		if (m_eGameMode == eMode_Bluetooth)
 			g_Transform.Send_Point(m_nPoint);
+	}
+	if (m_nPoint > m_nHighScore)
+	{
+		auto pt = unity::UserData::getInstance()->GetCurrentHighScore(m_nPoint);
+		if (m_nHighScore < pt)
+		{
+			m_nHighScore = pt;
+			label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_HighPoint));
+			if (label)
+			{
+				char temp[20];
+				sprintf(temp, "%d", m_nHighScore);
+				label->setString(temp);
+			}
+		}
 	}
 }
 

@@ -208,7 +208,7 @@ void Bluetooth::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::
 		break;
 	case EventKeyboard::KeyCode::KEY_ESCAPE:
 	{
-											   Director::getInstance()->end();
+											   unity::CleanAndExit();
 	}
 		break;
 	default:

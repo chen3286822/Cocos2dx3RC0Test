@@ -98,6 +98,7 @@ public:
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 	
 	void Restart(cocos2d::Ref* pSender);
+	void GoRank(cocos2d::Ref* pSender);
 
 	void AddPoint(int pt);
 	void AddOtherPoint(int pt);

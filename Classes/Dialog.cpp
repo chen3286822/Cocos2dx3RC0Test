@@ -1,5 +1,6 @@
 #include "Dialog.h"
 #include "Unity.h"
+#include "HelloWorldScene.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -112,6 +113,15 @@ void Dialog::touchEvent(Ref *pSender, TouchEventType type)
 
 	case TOUCH_EVENT_ENDED:
 	{
+							  if (m_bNewRecord)
+							  {
+								  //²åÈëÐÂ¼ÍÂ¼
+								  auto scene = dynamic_cast<HelloWorld*>(getParent());
+								  if (scene)
+								  {
+									  unity::UserData::getInstance()->InsertRecord("chen", 3000);
+								  }
+							  }
 							  m_vButtons[0].m_iCallback(pSender);
 	}
 		break;

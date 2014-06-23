@@ -60,5 +60,5 @@ void MainTitle::BluetoothMode(cocos2d::Ref* pSender)
 
 void MainTitle::Exit(cocos2d::Ref* pSender)
 {
-	Director::getInstance()->end();
+	unity::CleanAndExit();
 }
