@@ -104,10 +104,6 @@ public:
 	void AddOtherPoint(int pt);
 	void SetGameMode(eMode mode){ m_eGameMode = mode; }
 	eMode GetGameMode(){ return m_eGameMode; }
-	void SetPoint(int pt){ m_nPoint = pt; }
-	int GetPoint(){ return m_nPoint; }
-	void SetHighPoint(int pt){ m_nHighScore = pt; }
-	int GetHighPoint(){ return m_nHighScore; }
     
     // implement the "static create()" method manually
 	static HelloWorld* create(eMode mode);
@@ -121,8 +117,6 @@ private:
 	
 	CardRegion* m_pCardRegion{ nullptr };
 	CardRegion* m_pOtherCardRegion{ nullptr };
-	int m_nHighScore;				//历史最高得分
-	int m_nPoint{ 0 };				//得分
 
 	//一些控制布局的变量
 	int  m_nCardRegionOffset{ 2 };	//卡片区域到边界的偏移

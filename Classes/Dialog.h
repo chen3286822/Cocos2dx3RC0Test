@@ -44,11 +44,9 @@ private:
 	std::string m_strContent;
 	VTextButton m_vButtons;
 	cocos2d::ui::Button* m_pButton{ nullptr };
-	//ui::TextField has some bugs, use TextFieldTTF instead
-	//cocos2d::ui::TextField* m_pTextField{ nullptr };
+	//ui::TextField has some bugs, use EditBox instead
 	cocos2d::extension::EditBox* m_pEditBox{ nullptr };
 	cocos2d::Point m_iEditBoxPos;
-	std::string m_strName;
 	bool m_bButtonTouched{ false };
 	bool m_bTextFieldTouched{ false };
 

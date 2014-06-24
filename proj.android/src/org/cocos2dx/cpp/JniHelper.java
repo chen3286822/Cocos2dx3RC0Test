@@ -1,6 +1,7 @@
 package org.cocos2dx.cpp;
 
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -46,6 +47,16 @@ public class JniHelper {
 	{
 		Message msg = mHandler.obtainMessage();
 		msg.what = Cocos2dxActivity.STOP_BLUETOOTH;
+		msg.sendToTarget();
+	}
+	
+	public static void toastMsg(final String data)
+	{
+		Message msg = mHandler.obtainMessage();
+		msg.what = Cocos2dxActivity.MESSAGE_TOAST;
+		Bundle bundle = new Bundle();
+        bundle.putString(Cocos2dxActivity.TOAST, data);
+        msg.setData(bundle);
 		msg.sendToTarget();
 	}
 	

@@ -8,7 +8,7 @@ namespace unity
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 		return "fonts/American Typewriter.ttf";
 #elif(CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-		return "fonts/American Typewriter.ttf";
+		return "fonts/arial.ttf";
 #endif
 	}
 
@@ -151,7 +151,7 @@ namespace unity
 			{
 				//小于等于第10名
 				if (rit == m_mRecords.begin())
-					return;
+					break;
 				//插入其中，后面的依次后移一名
 				for (auto mit2 = m_mRecords.begin(); mit2 != rit; ++mit2)
 				{

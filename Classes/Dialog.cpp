@@ -1,6 +1,8 @@
 #include "Dialog.h"
 #include "Unity.h"
 #include "HelloWorldScene.h"
+#include "GameData.h"
+#include "JNIFunc.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -41,17 +43,23 @@ void Dialog::onEnter()
 // 	m_pTextField = static_cast<TextField*>(Helper::seekWidgetByName(m_pLayout, "NameEdit"));
 // 	m_pTextField->addEventListenerTextField(this, textfieldeventselector(Dialog::textFieldEvent));
 
-	auto editBg = Scale9Sprite::create("greenbuttonup.png");
-	m_pEditBox = EditBox::create(Size(171, 33), editBg);
-	m_pEditBox->setPosition(Point(m_pLayout->getPosition().x + 180, m_pLayout->getPosition().y + 87));
-	m_pEditBox->setPlaceHolder("Input Your Name");
-	m_pEditBox->setDelegate(this);
-	m_pEditBox->setInputMode(EditBox::InputMode::ANY);
-	m_pEditBox->setReturnType(EditBox::KeyboardReturnType::DONE);
-	m_pEditBox->setMaxLength(20);
-	m_iEditBoxPos = m_pEditBox->getPosition();
-	this->addChild(m_pEditBox, 1);
-	m_strName = "";
+	if (m_bNewRecord)
+	{
+		auto editBg = Scale9Sprite::create("greenbuttonup.png");
+		m_pEditBox = EditBox::create(Size(171, 33), editBg);
+		m_pEditBox->setPosition(Point(m_pLayout->getPosition().x + 180, m_pLayout->getPosition().y + 87));
+		m_pEditBox->setPlaceHolder("Input Your Name");
+		m_pEditBox->setDelegate(this);
+		m_pEditBox->setInputMode(EditBox::InputMode::ANY);
+		m_pEditBox->setReturnType(EditBox::KeyboardReturnType::DONE);
+		m_pEditBox->setMaxLength(13);
+		m_pEditBox->setFontColor(Color3B::BLUE);
+		m_pEditBox->setFont(unity::GetDefaultFontType(), 18);
+		m_pEditBox->setPlaceholderFont(unity::GetDefaultFontType(), 18);
+		m_pEditBox->setPlaceholderFontColor(Color3B::BLUE);
+		m_iEditBoxPos = m_pEditBox->getPosition();
+		this->addChild(m_pEditBox, 1);
+	}
 
 
 	m_pTouchListener = EventListenerTouchOneByOne::create();
@@ -70,10 +78,6 @@ void Dialog::onEnter()
 		//这里需要重新设置下字体，因为中文字体名称在读取json文件时变成乱码
 		titleLabel->setFontName(unity::GetDefaultFontType());
 		titleLabel->setText(m_strTitle);
-// 		auto titleLabel = LabelTTF::create(m_strTitle, "Arial", 40);
-// 		titleLabel->setColor(Color3B(30, 30, 30));
-// 		titleLabel->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height * 2 / 3 + origin.y));
-// 		this->addChild(titleLabel);
 	}
 
 	if (!m_strContent.empty())
@@ -81,34 +85,20 @@ void Dialog::onEnter()
 		auto contentLabel = static_cast<Text*>(Helper::seekWidgetByName(m_pLayout, "ContentLabel"));
 		contentLabel->setFontName(unity::GetDefaultFontType());
 		contentLabel->setText(m_strContent);
-		contentLabel->setFontSize(18);
-// 		auto contentLabel = LabelTTF::create(m_strContent, "Arial", 25, cocos2d::Size(visibleSize.width * 4 / 5, visibleSize.height / 5));
-// 		contentLabel->setAnchorPoint(Point(0.5, 1));
-// 		contentLabel->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height * 3 / 5 + origin.y));
-// 		this->addChild(contentLabel);
+		contentLabel->setFontSize(19);
 	}
 
 	if (!m_vButtons.empty())
 	{
-//		Vector<MenuItem*> vItems;
 		for (auto textButton : m_vButtons)
 		{
-// 			auto textLabel = LabelTTF::create(textButton.m_strText, "Arial", 20);
-//			auto textItem = MenuItemLabel::create(textLabel, textButton.m_iCallback);
-//			vItems.pushBack(textItem);
-
 			//暂时只容纳一个按钮及其回调函数
 			m_pButton->setTitleText(textButton.m_strText);
 			m_pButton->setTitleFontName(unity::GetDefaultFontType());
-			m_pButton->setTitleFontSize(20);
+			m_pButton->setTitleFontSize(22);
 			m_pButton->setTitleColor(Color3B::BLACK);
 			break;
 		}
-// 		m_pMenu = Menu::createWithArray(vItems);
-// 		m_pMenu->setAnchorPoint(Point(0.5, 1));
-// 		m_pMenu->setPosition(Point(visibleSize.width / 2 + origin.x, visibleSize.height * 2 / 5 + origin.y));
-// 		m_pMenu->alignItemsHorizontallyWithPadding(20);
-// 		this->addChild(m_pMenu);
 	}
 
 	this->stopAllActions();
@@ -147,16 +137,30 @@ void Dialog::touchEvent(Ref *pSender, TouchEventType type)
 
 	case TOUCH_EVENT_ENDED:
 	{
-							  if (m_bNewRecord)
-							  {
-								  //插入新纪录
-								  auto scene = dynamic_cast<HelloWorld*>(getParent());
-								  if (scene)
-								  {
-									  unity::UserData::getInstance()->InsertRecord("chen", 3000);
-								  }
-							  }
-							  m_vButtons[0].m_iCallback(pSender);
+		if (m_bNewRecord && m_pEditBox)
+		{
+			std::string Name = m_pEditBox->getText();
+			if (!Name.empty())
+			{
+				//插入新纪录
+				auto scene = dynamic_cast<HelloWorld*>(getParent());
+				if (scene)
+				{
+					unity::UserData::getInstance()->InsertRecord(Name.c_str(), g_Gamedata.getPoint());
+				}
+			}
+			else
+			{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+				toastMsg("You should input a name");
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+				cocos2d::MessageBox("You should input a name","Error");
+#endif		
+				return;
+			}
+
+		}
+		m_vButtons[0].m_iCallback(pSender);
 	}
 		break;
 

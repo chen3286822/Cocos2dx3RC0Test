@@ -199,17 +199,15 @@ void CardRegion::CheckFailure()
 		auto dialog = Dialog::create();
 		dialog->SetTitle("Game Over");
 		char temp[255];
-		if (unity::UserData::getInstance()->HasBreakRecord(helloWorld->GetPoint()))
+		if (unity::UserData::getInstance()->HasBreakRecord(g_Gamedata.getPoint()))
 		{
 			dialog->setNewRecord(true);
-			sprintf(temp, "A new record!\nYou got %d points!", helloWorld->GetPoint());
-			//helloWorld->SetHighPoint(helloWorld->GetPoint());
-			//UserDefault::getInstance()->setIntegerForKey("Score", helloWorld->GetHighPoint());
+			sprintf(temp, "A new record!\nYou got %d points!", g_Gamedata.getPoint());
 			dialog->AddButton("OK", CC_CALLBACK_1(HelloWorld::GoRank, dynamic_cast<HelloWorld*>(getParent())));
 		}
 		else
 		{
-			sprintf(temp, "You got %d points!\nNext record is %dpts.", helloWorld->GetPoint(), helloWorld->GetHighPoint());
+			sprintf(temp, "You got %d points!\nNext record is %dpts.", g_Gamedata.getPoint(), g_Gamedata.getCurrentTargetPoint());
 			dialog->AddButton("Restart", CC_CALLBACK_1(HelloWorld::Restart, dynamic_cast<HelloWorld*>(getParent())));
 		}
 
@@ -567,8 +565,9 @@ bool HelloWorld::init(eMode mode)
 	m_nStartSeconds = 0;
 	m_pKeyboardListener = nullptr;
 	m_pTouchListener = nullptr;
+	g_Gamedata.setPoint(0);
 
-	m_nHighScore = unity::UserData::getInstance()->GetCurrentHighScore(m_nPoint);
+	g_Gamedata.setCurrentTargetPoint(unity::UserData::getInstance()->GetCurrentHighScore(0));
 
 	m_pKeyboardListener = EventListenerKeyboard::create();
 	m_pKeyboardListener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyReleased, this);
@@ -658,7 +657,7 @@ bool HelloWorld::init(eMode mode)
 
 	auto labelPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
 	char temp[50];
-	sprintf(temp, "%d", m_nPoint);
+	sprintf(temp, "%d", g_Gamedata.getPoint());
 	labelPt->setString(temp);
 	labelPt->setColor(Color3B::WHITE);
 	labelPt->setAnchorPoint(cocos2d::Point(0.5, 0));
@@ -682,7 +681,7 @@ bool HelloWorld::init(eMode mode)
 		addChild(label, 2);
 
 		auto labelHighPt = LabelTTF::create("", unity::GetDefaultFontType(), m_nCardLength / 4);
-		sprintf(temp, "%d", m_nHighScore);
+		sprintf(temp, "%d", g_Gamedata.getCurrentTargetPoint());
 		labelHighPt->setString(temp);
 		labelHighPt->setColor(Color3B::WHITE);
 		labelHighPt->setAnchorPoint(cocos2d::Point(0.5, 0));
@@ -915,12 +914,12 @@ void HelloWorld::AddOtherPoint(int pt)
 
 void HelloWorld::AddPoint(int pt)
 {
-	m_nPoint += pt;
+	g_Gamedata.setPoint(g_Gamedata.getPoint() + pt);
 	auto label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_Point));
 	if (label)
 	{
 		char temp[20];
-		sprintf(temp, "%d", m_nPoint);
+		sprintf(temp, "%d", g_Gamedata.getPoint());
 		label->setString(temp);
 
 		//先恢复默认scale，否则快速加分，会导致之前scale没有恢复，但是又执行放大动作，导致分数越来越大
@@ -934,19 +933,19 @@ void HelloWorld::AddPoint(int pt)
 		label->runAction(sequenceAction);
 
 		if (m_eGameMode == eMode_Bluetooth)
-			g_Transform.Send_Point(m_nPoint);
+			g_Transform.Send_Point(g_Gamedata.getPoint());
 	}
-	if (m_nPoint > m_nHighScore)
+	if (g_Gamedata.getPoint() > g_Gamedata.getCurrentTargetPoint())
 	{
-		auto pt = unity::UserData::getInstance()->GetCurrentHighScore(m_nPoint);
-		if (m_nHighScore < pt)
+		auto pt = unity::UserData::getInstance()->GetCurrentHighScore(g_Gamedata.getPoint());
+		if (g_Gamedata.getCurrentTargetPoint() < pt)
 		{
-			m_nHighScore = pt;
+			g_Gamedata.setCurrentTargetPoint(pt);
 			label = dynamic_cast<LabelTTF*>(getChildByTag(eChild_HighPoint));
 			if (label)
 			{
 				char temp[20];
-				sprintf(temp, "%d", m_nHighScore);
+				sprintf(temp, "%d", g_Gamedata.getCurrentTargetPoint());
 				label->setString(temp);
 			}
 		}

@@ -22,6 +22,7 @@ extern "C"
 	void searchBluetooth();
 	void initBluetooth();
 	void stopBluetooth();
+	void toastMsg(const char* data);
 	void sendMessage(const char* data);
 	unsigned long getTickCount();
 	void debugLog(const char* tag,const char* data);

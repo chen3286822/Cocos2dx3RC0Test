@@ -59,6 +59,19 @@ extern "C"
 		}
 	}
 
+	//使用toast显示信息
+	void toastMsg(const char* data)
+	{
+		JniMethodInfo t;
+		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "toastMsg", "(Ljava/lang/String;)V"))
+		{
+			jstring jData = t.env->NewStringUTF(data);
+			t.env->CallStaticVoidMethod(t.classID, t.methodID,jData);
+			t.env->DeleteLocalRef(jData);
+			t.env->DeleteLocalRef(t.classID);
+		}
+	}
+
 	//向连接设备发送数据
 	void sendMessage(const char* data)
 	{
