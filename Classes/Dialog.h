@@ -13,7 +13,7 @@ struct TextButton
 };
 typedef std::vector<TextButton> VTextButton;
 
-class Dialog : public cocos2d::LayerColor
+class Dialog : public cocos2d::LayerColor, public cocos2d::extension::EditBoxDelegate
 {
 	CC_SYNTHESIZE(bool, m_bNewRecord, NewRecord);
 public:
@@ -31,6 +31,11 @@ public:
 
 	void touchEvent(cocos2d::Ref *pSender, cocos2d::ui::TouchEventType type);
 
+	virtual void editBoxEditingDidBegin(cocos2d::extension::EditBox* editBox);
+	virtual void editBoxEditingDidEnd(cocos2d::extension::EditBox* editBox);
+	virtual void editBoxTextChanged(cocos2d::extension::EditBox* editBox, const std::string& text);
+	virtual void editBoxReturn(cocos2d::extension::EditBox* editBox);
+
 	void AddButton(const char* text, const cocos2d::ccMenuCallback& callback);
 	void SetTitle(std::string title);
 	void SetContent(std::string content);
@@ -39,7 +44,13 @@ private:
 	std::string m_strContent;
 	VTextButton m_vButtons;
 	cocos2d::ui::Button* m_pButton{ nullptr };
+	//ui::TextField has some bugs, use TextFieldTTF instead
+	//cocos2d::ui::TextField* m_pTextField{ nullptr };
+	cocos2d::extension::EditBox* m_pEditBox{ nullptr };
+	cocos2d::Point m_iEditBoxPos;
+	std::string m_strName;
 	bool m_bButtonTouched{ false };
+	bool m_bTextFieldTouched{ false };
 
 	cocos2d::EventListenerTouchOneByOne* m_pTouchListener{ nullptr };
 

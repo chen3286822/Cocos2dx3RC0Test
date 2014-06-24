@@ -5,6 +5,7 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
+using namespace extension;
 
 bool Dialog::init()
 {
@@ -36,6 +37,21 @@ void Dialog::onEnter()
 
 	m_pButton = static_cast<Button*>(Helper::seekWidgetByName(m_pLayout, "OKButton"));
 	m_pButton->addTouchEventListener(this, toucheventselector(Dialog::touchEvent));
+
+// 	m_pTextField = static_cast<TextField*>(Helper::seekWidgetByName(m_pLayout, "NameEdit"));
+// 	m_pTextField->addEventListenerTextField(this, textfieldeventselector(Dialog::textFieldEvent));
+
+	auto editBg = Scale9Sprite::create("greenbuttonup.png");
+	m_pEditBox = EditBox::create(Size(171, 33), editBg);
+	m_pEditBox->setPosition(Point(m_pLayout->getPosition().x + 180, m_pLayout->getPosition().y + 87));
+	m_pEditBox->setPlaceHolder("Input Your Name");
+	m_pEditBox->setDelegate(this);
+	m_pEditBox->setInputMode(EditBox::InputMode::ANY);
+	m_pEditBox->setReturnType(EditBox::KeyboardReturnType::DONE);
+	m_pEditBox->setMaxLength(20);
+	m_iEditBoxPos = m_pEditBox->getPosition();
+	this->addChild(m_pEditBox, 1);
+	m_strName = "";
 
 
 	m_pTouchListener = EventListenerTouchOneByOne::create();
@@ -101,6 +117,24 @@ void Dialog::onEnter()
 	this->runAction(scaleAction);
 }
 
+void Dialog::editBoxEditingDidBegin(cocos2d::extension::EditBox* editBox)
+{
+}
+
+void Dialog::editBoxEditingDidEnd(cocos2d::extension::EditBox* editBox)
+{
+}
+
+void Dialog::editBoxTextChanged(cocos2d::extension::EditBox* editBox, const std::string& text)
+{
+
+}
+
+void Dialog::editBoxReturn(cocos2d::extension::EditBox* editBox)
+{
+
+}
+
 void Dialog::touchEvent(Ref *pSender, TouchEventType type)
 {
 	switch (type)
@@ -137,7 +171,9 @@ void Dialog::touchEvent(Ref *pSender, TouchEventType type)
 void Dialog::onExit()
 {
 	m_pButton = nullptr;
+	m_pEditBox = nullptr;
 	m_bButtonTouched = false;
+	m_bTextFieldTouched = false;
 	_eventDispatcher->removeEventListener(m_pTouchListener);
 	this->removeAllChildren();
 
@@ -151,6 +187,9 @@ bool Dialog::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 	//传递给那些menuitem 消息
 	if (m_pButton)
 		m_bButtonTouched = m_pButton->onTouchBegan(touch, event);
+
+	if (m_pEditBox)
+		m_bTextFieldTouched = m_pEditBox->onTouchBegan(touch, event);
 	return true;
 }
 
@@ -158,6 +197,8 @@ void Dialog::onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event)
 {
 	if (m_bButtonTouched && m_pButton)
 		m_pButton->onTouchMoved(touch, event);
+	if (m_bTextFieldTouched && m_pEditBox)
+		m_pEditBox->onTouchMoved(touch, event);
 }
 
 void Dialog::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event)
@@ -168,6 +209,12 @@ void Dialog::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event)
 			m_pButton->onTouchEnded(touch, event);
 		m_bButtonTouched = false;
 	}
+	if (m_bTextFieldTouched)
+	{
+		if (m_pEditBox)
+			m_pEditBox->onTouchEnded(touch, event);
+		m_bTextFieldTouched = false;
+	}
 }
 
 void Dialog::onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event)
@@ -177,6 +224,12 @@ void Dialog::onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event)
 		if (m_pButton)
 			m_pButton->onTouchCancelled(touch, event);
 		m_bButtonTouched = false;
+	}
+	if (m_bTextFieldTouched)
+	{
+		if (m_pEditBox)
+			m_pEditBox->onTouchCancelled(touch, event);
+		m_bTextFieldTouched = false;
 	}
 }
 
