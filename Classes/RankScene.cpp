@@ -44,7 +44,7 @@ bool RankLayer::init()
 	auto labelBack = LabelTTF::create("Back", unity::GetDefaultFontType(), 25);
 	auto itemBack = MenuItemLabel::create(labelBack, CC_CALLBACK_1(RankLayer::BackToMainTitle, this));
 	itemBack->setAnchorPoint(Point(1,0));
-	itemBack->setPosition(Point(visibleSize.width + origin.x - 20, origin.y + 10));
+	itemBack->setPosition(Point(visibleSize.width + origin.x - 20, origin.y + 20));
 	auto menu = Menu::create(itemBack, NULL);
 	menu->setPosition(Point::ZERO);
 	this->addChild(menu, 1, eChild_Menu);

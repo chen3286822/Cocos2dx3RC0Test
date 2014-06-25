@@ -16,7 +16,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/JNIFunc.cpp \
 				   ../../Classes/Unity.cpp \
 				   ../../Classes/Transform.cpp \
-				   ../../Classes/GameData.cpp
+				   ../../Classes/GameData.cpp \
+				   ../../Classes/RankScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 				../../cocos2d/extensions \

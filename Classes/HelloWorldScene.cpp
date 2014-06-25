@@ -676,7 +676,7 @@ bool HelloWorld::init(eMode mode)
 		spriteBest->setPosition(cocos2d::Point(startX, startY));
 		addChild(spriteBest, 1);
 
-		label = LabelTTF::create("BEST", unity::GetDefaultFontType(), 18);
+		label = LabelTTF::create("TARGET", unity::GetDefaultFontType(), 18);
 		label->setColor(Color3B(238, 228, 218));
 		label->setPosition(cocos2d::Point(startX + spriteBest->getTextureRect().size.width*spriteBest->getScaleX() / 2, startY + spriteBest->getTextureRect().size.height*spriteBest->getScaleY() * 3 / 4));
 		addChild(label, 2);

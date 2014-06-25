@@ -21,6 +21,7 @@ public:
 		eChild_CheckBluetoothItem,
 		eChild_StartGameItem,
 		eChild_ShowLabel,
+		eChild_BackItem,
 	};
 
 	static cocos2d::Scene* createScene();

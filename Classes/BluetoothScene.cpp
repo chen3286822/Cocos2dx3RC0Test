@@ -46,7 +46,7 @@ bool Bluetooth::init()
 	labelBluetooth->setColor(Color3B(249, 246, 242));
 	auto bluetoothItem = MenuItemLabel::create(labelBluetooth, CC_CALLBACK_1(Bluetooth::CheckBluetooth, this));
 	bluetoothItem->setAnchorPoint(Point(0.5, 0));
-	bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y));
+	bluetoothItem->setPosition(Point(origin.x + visibleSize.width/2, origin.y + 20));
 
 	//begin game menu item
  	auto labelStart = LabelTTF::create("Restart Game", unity::GetDefaultFontType(), 25);
@@ -54,10 +54,17 @@ bool Bluetooth::init()
 	auto startItem = MenuItemLabel::create(labelStart, CC_CALLBACK_1(Bluetooth::StartGame, this));
 	startItem->setPosition(Point(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
 	startItem->setVisible(false);
+
+	//back to the main title
+	auto labelBack = LabelTTF::create("Back", unity::GetDefaultFontType(), 25);
+	auto backItem = MenuItemLabel::create(labelBack, CC_CALLBACK_1(Bluetooth::BackToMainTitle, this));
+	backItem->setAnchorPoint(Point(1, 0));
+	backItem->setPosition(Point(visibleSize.width + origin.x - 20, origin.y + 20));
 	 
 	auto menuBluetooth = Menu::create();
 	menuBluetooth->addChild(bluetoothItem, 1, eChild_CheckBluetoothItem);
 	menuBluetooth->addChild(startItem, 1, eChild_StartGameItem);
+	menuBluetooth->addChild(backItem, 1, eChild_BackItem);
 	menuBluetooth->setPosition(Point::ZERO);
 	this->addChild(menuBluetooth, 1, eChild_Menu);
 
