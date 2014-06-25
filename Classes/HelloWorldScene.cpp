@@ -4,6 +4,7 @@
 #include "Unity.h"
 #include "Transform.h"
 #include "MainTitleScene.h"
+#include "RankScene.h"
 #include "GameData.h"
 
 USING_NS_CC;
@@ -745,14 +746,6 @@ bool HelloWorld::init(eMode mode)
 		unity::Log(TAG, "game scene init!");
 #endif
 	}
-
-	auto dialog = Dialog::create();
-	dialog->SetTitle("Game Over");
-	dialog->setNewRecord(true);
-	sprintf(temp, "A new record!\nYou got %d points!", 3000);
-	dialog->AddButton("OK", CC_CALLBACK_1(HelloWorld::GoRank, this));
-	dialog->SetContent(temp);
-	addChild(dialog, 3);
 	return true;
 }
 
@@ -813,7 +806,7 @@ void HelloWorld::Restart(cocos2d::Ref* pSender)
 void HelloWorld::GoRank(cocos2d::Ref* pSender)
 {
 	//ÅÅÐÐ°ñ³¡¾°
-	Director::getInstance()->replaceScene(MainTitle::createScene());
+	Director::getInstance()->replaceScene(RankLayer::createScene());
 }
 
 void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)

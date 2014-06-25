@@ -19,6 +19,7 @@ public:
 
 	void SingleMode(cocos2d::Ref* pSender);
 	void BluetoothMode(cocos2d::Ref* pSender);
+	void Rank(cocos2d::Ref* pSender);
 	void Exit(cocos2d::Ref* pSender);
 
 	// implement the "static create()" method manually

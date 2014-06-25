@@ -1,6 +1,7 @@
 #include "MainTitleScene.h"
 #include "HelloWorldScene.h"
 #include "BluetoothScene.h"
+#include "RankScene.h"
 #include "Unity.h"
 
 USING_NS_CC;
@@ -41,7 +42,10 @@ bool MainTitle::init()
 	auto labelExit = LabelTTF::create("Exit", unity::GetDefaultFontType(), 25);
 	auto itemExit = MenuItemLabel::create(labelExit, CC_CALLBACK_1(MainTitle::Exit,this));
 
-	auto menu = Menu::create(itemSingleMode, itemBluetoothMode, itemExit, NULL);
+	auto labelRank = LabelTTF::create("Rank", unity::GetDefaultFontType(), 25);
+	auto itemRank = MenuItemLabel::create(labelRank, CC_CALLBACK_1(MainTitle::Rank, this));
+
+	auto menu = Menu::create(itemSingleMode, itemBluetoothMode, itemRank, itemExit, NULL);
 	menu->setPosition(Point(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
 	menu->alignItemsVerticallyWithPadding(25);
 	this->addChild(menu, 1, eChild_Menu);
@@ -61,4 +65,9 @@ void MainTitle::BluetoothMode(cocos2d::Ref* pSender)
 void MainTitle::Exit(cocos2d::Ref* pSender)
 {
 	unity::CleanAndExit();
+}
+
+void MainTitle::Rank(cocos2d::Ref* pSender)
+{
+	Director::getInstance()->replaceScene(RankLayer::createScene());
 }

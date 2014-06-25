@@ -78,7 +78,7 @@ namespace unity
 		UserData::Record(6, "Kobe", 10000),
 		UserData::Record(5, "Sam", 15000),
 		UserData::Record(4, "Naruto", 20000),
-		UserData::Record(3, "Doom", 3000),
+		UserData::Record(3, "Doom", 30000),
 		UserData::Record(2, "Acfun", 50000),
 		UserData::Record(1, "Bilibili", 100000),
 	};

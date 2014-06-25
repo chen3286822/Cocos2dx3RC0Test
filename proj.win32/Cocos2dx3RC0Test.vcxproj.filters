@@ -51,6 +51,9 @@
     <ClCompile Include="..\Classes\GameData.cpp">
       <Filter>Classes\Unity</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\RankScene.cpp">
+      <Filter>Classes\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\GameData.h">
       <Filter>Classes\Unity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\RankScene.h">
+      <Filter>Classes\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
