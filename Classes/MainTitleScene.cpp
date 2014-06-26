@@ -19,9 +19,9 @@ bool BgLayer::init()
 
 	for (auto i = 0; i < 4;i++)
 	{
-		m_pBg[i] = Sprite::create("bg.png", Rect(0, 0, visibleSize.width, visibleSize.height));
-		Texture2D::TexParams params = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
-		m_pBg[i]->getTexture()->setTexParameters(params);
+		m_pBg[i] = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("bg.png"), Rect(0, 0, visibleSize.width, visibleSize.height));
+ 		Texture2D::TexParams params = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
+ 		m_pBg[i]->getTexture()->setTexParameters(params);
 		m_pBg[i]->setAnchorPoint(Point(0, 0));
 		this->addChild(m_pBg[i], 0, eChild_Bg1 + i);
 		m_nPos[i] = i;
@@ -123,6 +123,9 @@ bool MainTitle::init()
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
+
+	Director::getInstance()->getTextureCache()->addImage("bg.png");
+
 
 	//background
 	m_pBgLayer = BgLayer::create();

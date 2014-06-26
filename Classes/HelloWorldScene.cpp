@@ -140,8 +140,13 @@ void CardRegion::AddCard(bool bInit)
 			}
 			else if (!m_bOther)
 			{
-				//send card info to other
-				g_Transform.Send_Add_Card((int)card->GetPos().x, (int)card->GetPos().y, card->getNum());
+				auto helloWorld = dynamic_cast<HelloWorld*>(getParent());
+				if (helloWorld)
+				{
+					//send card info to other
+					if (helloWorld->GetGameMode() == HelloWorld::eMode_Bluetooth)
+						g_Transform.Send_Add_Card((int)card->GetPos().x, (int)card->GetPos().y, card->getNum());
+				}
 			}
 			break;
 		}
@@ -830,7 +835,13 @@ void HelloWorld::Back(cocos2d::Ref* pSender)
 	else
 	{
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		showTipDialog("Warning","Do you want to go back?",BACK_TO_MAIN_TITLE_DIALOG);
+		Director::getInstance()->replaceScene(MainTitle::createScene());
+		/*
+			这里有bug！ 当调用询问对话框时，程序焦点转移到安卓系统对话框上
+			当点击确定，焦点返回时，openGL ES的上下文就丢失了，导致程序crash 或者其他问题发生
+			等待解决中。。。
+		*/
+		//showTipDialog("Warning","Do you want to go back?",BACK_TO_MAIN_TITLE_DIALOG);
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 		Director::getInstance()->replaceScene(MainTitle::createScene());
 #endif

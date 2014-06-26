@@ -94,6 +94,12 @@ public class Cocos2dxActivity extends NativeActivity{
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
+						/*has bugs!!!
+						 *when focus change from android dialog to the game
+						 *the opengl es context is lost!
+						 *so the app will crash or occur other strange problems
+						 *wait for help...
+						 */
 						dialog.dismiss();
 						JniHelper.backToMainTitle();
 					}
