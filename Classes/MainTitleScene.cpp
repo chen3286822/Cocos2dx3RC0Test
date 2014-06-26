@@ -6,6 +6,37 @@
 
 USING_NS_CC;
 
+bool BgLayer::init()
+{
+	// 1. super init first
+	if (!Layer::init())
+	{
+		return false;
+	}
+
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Point origin = Director::getInstance()->getVisibleOrigin();
+
+	for (auto i = 0; i < 4;i++)
+	{
+		m_pBg[i] = Sprite::create("bg.png", Rect(0, 0, visibleSize.width, visibleSize.height));
+		Texture2D::TexParams params = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
+		m_pBg[i]->getTexture()->setTexParameters(params);
+		m_pBg[i]->setPosition(Point(origin.x, origin.y));
+		m_pBg[i]->setAnchorPoint(Point(0, 0));
+		this->addChild(m_pBg[i], 0, eChild_Bg1 + i);
+	}
+
+	unscheduleUpdate();
+	scheduleUpdate();
+	return true;
+}
+
+void BgLayer::update(float fDelta)
+{
+
+}
+
 Scene* MainTitle::createScene()
 {
 	// 'scene' is an autorelease object
@@ -31,6 +62,10 @@ bool MainTitle::init()
 
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
+
+	//background
+	m_pBgLayer = BgLayer::create();
+	this->addChild(m_pBgLayer, 0, eChild_Background);
 
 	//List
 	auto labelSingleMode = LabelTTF::create("Single Mode", unity::GetDefaultFontType(), 25);

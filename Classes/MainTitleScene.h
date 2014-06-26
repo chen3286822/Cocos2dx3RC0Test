@@ -4,6 +4,25 @@
 
 #include "cocos2d.h"
 
+class BgLayer : public cocos2d::Layer
+{
+public:
+	enum eChild
+	{
+		eChild_Bg1,
+		eChild_Bg2,
+		eChild_Bg3,
+		eChild_Bg4,
+	};
+
+	CREATE_FUNC(BgLayer);
+
+	virtual bool init();
+	virtual void update(float fDelta);
+private:
+	cocos2d::Sprite* m_pBg[4];
+};
+
 class MainTitle : public cocos2d::LayerColor
 {
 public:
@@ -11,6 +30,7 @@ public:
 	{
 		eChild_MainTitleLayer,
 		eChild_Menu,
+		eChild_Background,
 	};
 
 	static cocos2d::Scene* createScene();
@@ -24,6 +44,9 @@ public:
 
 	// implement the "static create()" method manually
 	CREATE_FUNC(MainTitle);
+
+private:
+	BgLayer* m_pBgLayer{ nullptr };
 };
 
 #endif
