@@ -17,11 +17,19 @@ bool BgLayer::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 
-	for (auto i = 0; i < 4;i++)
+	Director::getInstance()->getTextureCache()->addImageAsync("bg.png", CC_CALLBACK_1(BgLayer::SetBackGroundTextureAsys,this));
+
+	return true;
+}
+
+void BgLayer::SetBackGroundTextureAsys(cocos2d::Texture2D* texture)
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	for (auto i = 0; i < 4; i++)
 	{
-		m_pBg[i] = Sprite::createWithTexture(Director::getInstance()->getTextureCache()->getTextureForKey("bg.png"), Rect(0, 0, visibleSize.width, visibleSize.height));
- 		Texture2D::TexParams params = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
- 		m_pBg[i]->getTexture()->setTexParameters(params);
+		m_pBg[i] = Sprite::createWithTexture(texture, Rect(0, 0, visibleSize.width, visibleSize.height));
+		Texture2D::TexParams params = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
+		m_pBg[i]->getTexture()->setTexParameters(params);
 		m_pBg[i]->setAnchorPoint(Point(0, 0));
 		this->addChild(m_pBg[i], 0, eChild_Bg1 + i);
 		m_nPos[i] = i;
@@ -32,10 +40,8 @@ bool BgLayer::init()
 	m_pBg[2]->setPosition(Point(0, -visibleSize.height));
 	m_pBg[3]->setPosition(Point(-visibleSize.width, -visibleSize.height));
 
-
 	unscheduleUpdate();
 	scheduleUpdate();
-	return true;
 }
 
 void BgLayer::update(float fDelta)
@@ -124,7 +130,7 @@ bool MainTitle::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 
-	Director::getInstance()->getTextureCache()->addImage("bg.png");
+	//Director::getInstance()->getTextureCache()->addImage("bg.png");
 
 
 	//background
