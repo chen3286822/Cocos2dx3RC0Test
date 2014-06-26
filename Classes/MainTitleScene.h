@@ -21,6 +21,7 @@ public:
 	virtual void update(float fDelta);
 private:
 	cocos2d::Sprite* m_pBg[4];
+	int m_nPos[4];//标记4个背景图的位置, 0右上1左上2右下3左下
 };
 
 class MainTitle : public cocos2d::LayerColor

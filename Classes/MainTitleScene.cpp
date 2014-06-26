@@ -22,10 +22,16 @@ bool BgLayer::init()
 		m_pBg[i] = Sprite::create("bg.png", Rect(0, 0, visibleSize.width, visibleSize.height));
 		Texture2D::TexParams params = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
 		m_pBg[i]->getTexture()->setTexParameters(params);
-		m_pBg[i]->setPosition(Point(origin.x, origin.y));
 		m_pBg[i]->setAnchorPoint(Point(0, 0));
 		this->addChild(m_pBg[i], 0, eChild_Bg1 + i);
+		m_nPos[i] = i;
 	}
+
+	m_pBg[0]->setPosition(Point(0, 0));
+	m_pBg[1]->setPosition(Point(-visibleSize.width, 0));
+	m_pBg[2]->setPosition(Point(0, -visibleSize.height));
+	m_pBg[3]->setPosition(Point(-visibleSize.width, -visibleSize.height));
+
 
 	unscheduleUpdate();
 	scheduleUpdate();
@@ -34,6 +40,61 @@ bool BgLayer::init()
 
 void BgLayer::update(float fDelta)
 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	auto xSpeed = fDelta * 20;
+	auto ySpeed = fDelta * 30;
+	
+	auto yRightUp = m_pBg[m_nPos[0]]->getPositionY();
+	yRightUp += ySpeed; 
+
+	if (yRightUp >= visibleSize.height)
+	{
+		m_pBg[m_nPos[0]]->setPositionY(-visibleSize.height);
+		m_pBg[m_nPos[1]]->setPositionY(-visibleSize.height);
+		m_pBg[m_nPos[2]]->setPositionY(0);
+		m_pBg[m_nPos[3]]->setPositionY(0);
+
+		//ÐÞ¸Ä±àºÅÎ»ÖÃ
+		auto temp = m_nPos[0];
+		m_nPos[0] = m_nPos[2];
+		m_nPos[2] = temp;
+		temp = m_nPos[1];
+		m_nPos[1] = m_nPos[3];
+		m_nPos[3] = temp;
+	}
+	else
+	{
+		for (auto bg : m_pBg)
+		{
+			bg->setPositionY(bg->getPositionY() + ySpeed);
+		}
+	}
+
+	auto xRightUp = m_pBg[m_nPos[0]]->getPositionX();
+	xRightUp += xSpeed;
+
+	if (xRightUp >= visibleSize.width)
+	{
+		m_pBg[m_nPos[0]]->setPositionX(-visibleSize.width);
+		m_pBg[m_nPos[2]]->setPositionX(-visibleSize.width);
+		m_pBg[m_nPos[1]]->setPositionX(0);
+		m_pBg[m_nPos[3]]->setPositionX(0);
+
+		//ÐÞ¸Ä±àºÅÎ»ÖÃ
+		auto temp = m_nPos[0];
+		m_nPos[0] = m_nPos[1];
+		m_nPos[1] = temp;
+		temp = m_nPos[2];
+		m_nPos[2] = m_nPos[3];
+		m_nPos[3] = temp;
+	}
+	else
+	{
+		for (auto bg : m_pBg)
+		{
+			bg->setPositionX(bg->getPositionX() + xSpeed);
+		}
+	}
 
 }
 
@@ -65,6 +126,7 @@ bool MainTitle::init()
 
 	//background
 	m_pBgLayer = BgLayer::create();
+	m_pBgLayer->setPosition(origin.x, origin.y);
 	this->addChild(m_pBgLayer, 0, eChild_Background);
 
 	//List
