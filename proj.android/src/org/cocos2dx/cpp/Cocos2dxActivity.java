@@ -75,6 +75,32 @@ public class Cocos2dxActivity extends NativeActivity{
 				.create().show();
 			}
 				break;
+			case BACK_TO_MAIN_TITLE_DIALOG:
+			{
+				DialogMessage dm = (DialogMessage)msg.obj;
+				new AlertDialog.Builder(Cocos2dxActivity.this)
+				.setTitle(dm.title)
+				.setMessage(dm.msg).setNegativeButton("cancle",
+						new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						dialog.dismiss();
+					}
+				})
+				.setPositiveButton("Ok",
+						new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						dialog.dismiss();
+						JniHelper.backToMainTitle();
+					}
+				})
+				.create().show();
+			}
+				break;
 			case ASK_ENABLE_BLUETOOTH:
 			{
 			    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -338,6 +364,7 @@ public class Cocos2dxActivity extends NativeActivity{
 	//more msg
     public static final int STOP_BLUETOOTH = 0x0011;
     public static final int SEND_MESSAGE = 0x0012;
+    public static final int BACK_TO_MAIN_TITLE_DIALOG = 0x0013;
     
 	//msg for bluetooth state
 	public static final int REQUEST_ENABLE_BLUETOOTH = 0x01;

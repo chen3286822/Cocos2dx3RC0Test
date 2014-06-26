@@ -2,6 +2,7 @@
 #include "cocos2d.h"
 #include "BluetoothScene.h"
 #include "Transform.h"
+#include "MainTitleScene.h"
 #include "Unity.h"
 
 USING_NS_CC;
@@ -115,6 +116,11 @@ extern "C"
 	void Java_org_cocos2dx_cpp_JniHelper_exitApp(JNIEnv *env, jobject thiz)
 	{
 		unity::CleanAndExit();
+	}
+
+	void Java_org_cocos2dx_cpp_JniHelper_backToMainTitle(JNIEnv *env, jobject thiz)
+	{
+		Director::getInstance()->replaceScene(MainTitle::createScene());
 	}
 
 	void Java_org_cocos2dx_cpp_JniHelper_stopBluetoothCheck(JNIEnv *env, jobject thiz)

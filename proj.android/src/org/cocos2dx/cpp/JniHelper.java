@@ -15,8 +15,6 @@ public class JniHelper {
 		JniHelper.mHandler = handler;
 	}
 	
-	public static native void exitApp();
-	
 	public static void showTipDialog(final String title,final String text,final int msgID)
 	{
 		 Message msg = mHandler.obtainMessage();
@@ -79,6 +77,8 @@ public class JniHelper {
 		Log.d(tag,data);
 	}
 	
+	public static native void exitApp();
+	public static native void backToMainTitle();
 	public static native void stopBluetoothCheck();
 	public static native void addBluetoothPairedDevice(final String name,final String MAC);
 	public static native void getMessage(final String data);

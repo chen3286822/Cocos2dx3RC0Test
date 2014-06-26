@@ -99,11 +99,13 @@ public:
 	
 	void Restart(cocos2d::Ref* pSender);
 	void GoRank(cocos2d::Ref* pSender);
+	void Back(cocos2d::Ref* pSender);
 
 	void AddPoint(int pt);
 	void AddOtherPoint(int pt);
 	void SetGameMode(eMode mode){ m_eGameMode = mode; }
 	eMode GetGameMode(){ return m_eGameMode; }
+	bool& GetCardMoved(){ return m_bHasMoved; }
     
     // implement the "static create()" method manually
 	static HelloWorld* create(eMode mode);
@@ -132,6 +134,7 @@ private:
 
 	cocos2d::Point m_iStartPt;			//记录每次开始触摸的开始点坐标，用于判断滑动方向
 	bool m_bMoving{ false };		//判断卡片是否在移动中，用于决定是否接受触摸操作
+	bool m_bHasMoved{ false };	//纪录玩家是否已经移动过卡片了，用于判断是否可以直接退出当前游戏
 
 	eMode m_eGameMode{eMode_Single};			//游戏模式
 	unsigned long m_dwStartTime{ 0 };

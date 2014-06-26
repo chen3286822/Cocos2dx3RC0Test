@@ -399,6 +399,13 @@ void CardRegion::MoveAction(int x, int y, cocos2d::EventKeyboard::KeyCode dir)
 		auto sequenceAction = Sequence::create(moveAction, doneAction, NULL);
 		moveCard.m_pCard->runAction(sequenceAction);
 		moveCard.m_bMoving = true;
+
+		auto helloWorld = dynamic_cast<HelloWorld*>(getParent());
+		if (helloWorld)
+		{
+			helloWorld->GetCardMoved() = true;
+		}
+		
 	}
 }
 
@@ -560,6 +567,7 @@ bool HelloWorld::init(eMode mode)
 		return false;
 	}
 
+	m_bHasMoved = false;
 	m_eGameMode = mode;
 	m_bGetStartInformed = false;
 	m_dwStartTime = 0;
@@ -637,7 +645,13 @@ bool HelloWorld::init(eMode mode)
 		restartItem->setAnchorPoint(Point(0.5, 0.5));
 		restartItem->setPosition(Point(spriteNewGame->getPosition().x - spriteNewGame->getTextureRect().size.width * spriteNewGame->getScaleX() / 2, spriteNewGame->getPosition().y + spriteNewGame->getTextureRect().size.height * spriteNewGame->getScaleY() / 2));
 
-		auto menu = Menu::create(restartItem, NULL);
+		auto labelBack = LabelTTF::create("Back", unity::GetDefaultFontType(), 25);
+		labelBack->setColor(Color3B::BLACK);
+		auto backItem = MenuItemLabel::create(labelBack, CC_CALLBACK_1(HelloWorld::Back,this));
+		backItem->setAnchorPoint(Point(1, 0));
+		backItem->setPosition(Point(visibleSize.width + origin.x - 20, origin.y + 20));
+
+		auto menu = Menu::create(restartItem, backItem, NULL);
 		menu->setPosition(Point::ZERO);
 		this->addChild(menu, 2);
 	}
@@ -807,6 +821,20 @@ void HelloWorld::GoRank(cocos2d::Ref* pSender)
 {
 	//ÅÅÐÐ°ñ³¡¾°
 	Director::getInstance()->replaceScene(RankLayer::createScene());
+}
+
+void HelloWorld::Back(cocos2d::Ref* pSender)
+{
+	if (!m_bHasMoved)
+		Director::getInstance()->replaceScene(MainTitle::createScene());
+	else
+	{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		showTipDialog("Warning","Do you want to go back?",BACK_TO_MAIN_TITLE_DIALOG);
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+		Director::getInstance()->replaceScene(MainTitle::createScene());
+#endif
+	}
 }
 
 void HelloWorld::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)

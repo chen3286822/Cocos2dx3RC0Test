@@ -10,6 +10,7 @@
 #define CLASS_NAME "org/cocos2dx/cpp/JniHelper"
 #define EXIT_DIALOG 0x01
 #define NO_BLUETOOTH_DIALOG 0x02
+#define BACK_TO_MAIN_TITLE_DIALOG 0x013
 
 #define STATE_NONE 0					//初始化及断开连接时的状态
 #define STATE_LISTEN 1					//监听状态
